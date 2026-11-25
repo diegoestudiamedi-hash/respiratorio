@@ -248,6 +248,34 @@
       margin-bottom: 14px;
     }
 
+    .badge-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .badge-row .category-badge {
+      margin-bottom: 0;
+    }
+
+    .case-badge {
+      display: none;
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+      background: rgba(56, 189, 248, 0.16);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.45);
+    }
+
+    .case-badge.show {
+      display: inline-block;
+    }
+
     .question-text {
       font-size: 1.12rem;
       line-height: 1.5;
@@ -386,7 +414,10 @@
   <!-- Modal de Pregunta -->
   <div class="modal-backdrop" id="questionModal">
     <div class="modal-card">
-      <span class="category-badge" id="modalCategory">Categoría</span>
+      <div class="badge-row">
+        <span class="category-badge" id="modalCategory">Categoría</span>
+        <span class="case-badge" id="modalCaseBadge">🩺 Caso Clínico</span>
+      </div>
       <p class="question-text" id="modalQuestion"></p>
       <div class="options-list" id="modalOptions"></div>
       <div class="feedback-box" id="modalFeedback"></div>
@@ -466,204 +497,7 @@
           options: ["Efedrina", "Terbutalina", "Metaproterenol", "Cromolín"],
           answer: 0,
           feedback: "La efedrina actúa sobre receptores adrenérgicos y además favorece la liberación de noradrenalina, elevando el riesgo cardiovascular."
-        }
-      ],
-      antiinflamatorios: [
-        {
-          q: "¿Cuál de los siguientes glucocorticoides inhalados contiene flúor en su estructura, otorgándole mayor potencia, vida media más larga y mejor penetración tisular?",
-          options: ["Fluticasona", "Beclometasona", "Hidrocortisona", "Prednisona"],
-          answer: 0,
-          feedback: "La fluticasona es un glucocorticoide inhalado más potente y con mayor vida media que beclometasona o budesonida, ideal para cuadros con mayor inflamación."
         },
-        {
-          q: "¿Qué glucocorticoide es de elección en urgencias por vía intravenosa para estabilizar a un paciente con crisis asmática grave y desaturación?",
-          options: ["Hidrocortisona", "Prednisona", "Budesonida", "Ciclesonida"],
-          answer: 0,
-          feedback: "En urgencias ante descompensación aguda se prefiere la vía intravenosa, por lo que hidrocortisona es la opción frente a prednisona (oral)."
-        },
-        {
-          q: "¿Cuál de estos glucocorticoides se caracteriza por ser un profármaco con alta unión a proteínas plasmáticas (UPP) y buen perfil en asma, aunque poco usado en Chile?",
-          options: ["Ciclesonida", "Fluticasona", "Triamcinolona", "Mometasona"],
-          answer: 0,
-          feedback: "La ciclesonida es un profármaco con alta UPP; en la práctica clínica local se utilizan con mayor frecuencia beclometasona, budesonida y fluticasona."
-        },
-        {
-          q: "¿Qué par de glucocorticoides inhalados cuenta con amplia trayectoria clínica, siendo el primero habitualmente elegido al iniciar terapia controladora?",
-          options: ["Beclometasona y Budesonida", "Salmeterol y Formoterol", "Zileutón y Montelukast", "Ipratropio y Tiotropio"],
-          answer: 0,
-          feedback: "Beclometasona y budesonida poseen un perfil de seguridad y eficacia bien establecido como base del manejo antiinflamatorio del asma."
-        },
-        {
-          q: "¿Cuál de los siguientes fármacos pertenece a los glucocorticoides que NO relajan directamente el músculo liso, pero aumentan la expresión génica de receptores β2?",
-          options: ["Mometasona", "Teofilina", "Salbutamol", "Benralizumab"],
-          answer: 0,
-          feedback: "Los glucocorticoides (como mometasona, budesonida o fluticasona) ejercen una acción permisiva sobre catecolaminas al incrementar los receptores β2."
-        },
-        {
-          q: "¿Cuál de estos fármacos corresponde a un glucocorticoide cuyo uso inhalatorio puede provocar candidiasis bucofaríngea y ronquera si se deposita en orofaringe?",
-          options: ["Triamcinolona", "Bromuro de ipratropio", "Zafirlukast", "Nedocromil"],
-          answer: 0,
-          feedback: "El depósito local de glucocorticoides inhalados causa inmunosupresión local (candidiasis) y engrosamiento de cuerdas vocales (ronquera); la aerocámara y el enjuague reducen este riesgo."
-        }
-      ],
-      antimuscarinicos: [
-        {
-          q: "¿Qué antimuscarínico es un amonio cuaternario de vida media corta que, combinado con salbutamol, potencia la broncodilatación en asma grave?",
-          options: ["Bromuro de ipratropio", "Tiotropio", "Atropina", "Salmeterol"],
-          answer: 0,
-          feedback: "El bromuro de ipratropio bloquea receptores muscarínicos evitando la broncoconstricción colinérgica y es una buena alternativa en intolerantes a β2."
-        },
-        {
-          q: "¿Cuál de estos antimuscarínicos de acción prolongada (24 h con 18 µg) se disocia rápidamente del receptor M2, siendo más seguro a nivel cardíaco y muy útil en EPOC?",
-          options: ["Tiotropio", "Bromuro de ipratropio", "Atropina", "Teofilina"],
-          answer: 0,
-          feedback: "El tiotropio se une a M1, M2 y M3 pero se disocia rápido de M2, disminuyendo el riesgo de taquicardia refleja y reduciendo exacerbaciones en EPOC."
-        },
-        {
-          q: "¿Qué antagonista colinérgico no está disponible por vía inhalatoria y se evita en asma por producir xerostomía, midriasis, fotofobia y taquicardia sistémica?",
-          options: ["Atropina", "Tiotropio", "Bromuro de ipratropio", "Roflumilast"],
-          answer: 0,
-          feedback: "La atropina bloquea de forma no selectiva todos los receptores muscarínicos con vida media larga, generando importantes RAM anticolinérgicas sistémicas."
-        },
-        {
-          q: "Entre los antimuscarínicos inhalados, ¿cuál resulta más seguro frente al riesgo de taquicardia por bloqueo M2 en pacientes vulnerables?",
-          options: ["Tiotropio", "Atropina", "Adrenalina", "Isoproterenol"],
-          answer: 0,
-          feedback: "Al tener menor afinidad/disociación más rápida sobre M2 que ipratropio, el tiotropio conlleva menor riesgo de sobrecarga cardíaca."
-        },
-        {
-          q: "¿Qué antimuscarínico de acción corta debe evitarse en dosis altas en pacientes con IAM reciente debido a que puede pasar a sangre y bloquear receptores M2?",
-          options: ["Bromuro de ipratropio", "Montelukast", "Fluticasona", "Cromolín"],
-          answer: 0,
-          feedback: "En sobredosificación, el bromuro de ipratropio puede bloquear receptores M2 cardíacos, inhibiendo el tono vagal y desencadenando taquicardia."
-        },
-        {
-          q: "¿Cuál de las siguientes tríadas agrupa exclusivamente antagonistas competitivos de los receptores colinérgicos muscarínicos?",
-          options: [
-            "Atropina, Bromuro de ipratropio y Tiotropio",
-            "Salbutamol, Salmeterol y Formoterol",
-            "Montelukast, Zafirlukast y Zileutón",
-            "Beclometasona, Budesonida y Fluticasona"
-          ],
-          answer: 0,
-          feedback: "Los tres inhiben competitivamente receptores muscarínicos (M3 en vía aérea), impidiendo la broncoconstricción y el exceso de secreciones vagales."
-        }
-      ],
-      leucotrienos: [
-        {
-          q: "¿Qué fármaco inhibe la enzima 5-lipooxigenasa (5-LO), por lo que solo es útil en profilaxis crónica y NO revierte una crisis aguda ya instalada?",
-          options: ["Zileutón", "Montelukast", "Zafirlukast", "Pranlukast"],
-          answer: 0,
-          feedback: "Zileutón frena la síntesis de nuevos leucotrienos, pero no bloquea los mediadores que ya fueron liberados y están circulando en la vía aérea."
-        },
-        {
-          q: "¿Cuál es el antagonista del receptor de leucotrienos (CysLT1) más conocido, disponible en Chile y ampliamente utilizado en población pediátrica?",
-          options: ["Montelukast", "Zileutón", "Roflumilast", "Omalizumab"],
-          answer: 0,
-          feedback: "Montelukast actúa como 'corcho' bloqueando el receptor CysLT1, con fácil administración oral y muy pocos efectos adversos."
-        },
-        {
-          q: "Además de Montelukast, ¿qué otros dos fármacos actúan como antagonistas competitivos de los receptores CysLT1 de leucotrienos?",
-          options: ["Zafirlukast y Pranlukast", "Zileutón y Roflumilast", "Cromolín y Nedocromil", "Mepolizumab y Dupilumab"],
-          answer: 0,
-          feedback: "Montelukast, zafirlukast y pranlukast bloquean la unión de LTC4, LTD4 y LTE4 al receptor CysLT1."
-        },
-        {
-          q: "Ante un paciente con broncoconstricción donde los leucotrienos ya están circulando en sangre y vía aérea, ¿qué fármaco logra bloquear su acción directamente en el receptor?",
-          options: ["Montelukast", "Zileutón", "Cromolín", "Ciclesonida"],
-          answer: 0,
-          feedback: "A diferencia de los inhibidores enzimáticos (zileutón), un antagonista de receptor como montelukast impide que el mediador ya liberado ejerza su efecto."
-        },
-        {
-          q: "¿Qué fármaco inhibe de forma irreversible la ciclooxigenasa (COX), desviando el ácido araquidónico hacia la vía de los leucotrienos y gatillando asma iatrogénica?",
-          options: ["Ácido acetilsalicílico (Aspirina)", "Montelukast", "Zileutón", "Budesonida"],
-          answer: 0,
-          feedback: "El bloqueo irreversible de la COX por aspirina desvía el sustrato hacia la 5-lipooxigenasa, elevando la producción de leucotrienos broncoconstrictores."
-        },
-        {
-          q: "¿Qué par combina correctamente un inhibidor de la 5-lipooxigenasa y un antagonista del receptor CysLT1?",
-          options: ["Zileutón y Zafirlukast", "Montelukast y Pranlukast", "Teofilina y Aminofilina", "Salbutamol y Formoterol"],
-          answer: 0,
-          feedback: "Zileutón inhibe la enzima 5-LO, mientras que zafirlukast (al igual que montelukast y pranlukast) antagoniza el receptor CysLT1."
-        }
-      ],
-      monoclonales: [
-        {
-          q: "¿Cuál fue el primer anticuerpo monoclonal aprobado en asma alérgica grave, dirigido contra la IgE (vía SC) y capaz de reducir hospitalizaciones hasta en 88%?",
-          options: ["Omalizumab", "Mepolizumab", "Dupilumab", "Tezepelumab"],
-          answer: 0,
-          feedback: "Omalizumab (Xolair) impide la unión de la IgE a los receptores FcεRI/R2 en mastocitos y basófilos, reduciendo drásticamente las exacerbaciones."
-        },
-        {
-          q: "¿Qué anticuerpo monoclonal se dirige contra el receptor IL-5Rα induciendo destrucción de eosinófilos (ADCC) en asma eosinofílica grave?",
-          options: ["Benralizumab", "Omalizumab", "Dupilumab", "Tezepelumab"],
-          answer: 0,
-          feedback: "Benralizumab (Fasenra) se administra vía SC y bloquea IL-5Rα, promoviendo citotoxicidad dependiente de anticuerpos sobre eosinófilos."
-        },
-        {
-          q: "¿Cuál de los siguientes anticuerpos monoclonales anti-IL-5 se administra principalmente por vía intravenosa (IV) en adultos con asma eosinofílica?",
-          options: ["Reslizumab", "Mepolizumab", "Benralizumab", "Omalizumab"],
-          answer: 0,
-          feedback: "Reslizumab (Cinqaero/Cinqair) actúa contra IL-5 por vía IV, a diferencia de mepolizumab que es subcutáneo."
-        },
-        {
-          q: "¿Qué anticuerpo monoclonal subcutáneo bloquea IL-4Rα (vía IL-4/IL-13) y está indicado en el fenotipo de asma T2-high (eosinófilos y/o FeNO elevado)?",
-          options: ["Dupilumab", "Tezepelumab", "Reslizumab", "Omalizumab"],
-          answer: 0,
-          feedback: "Dupilumab (Dupixent) bloquea la subunidad compartida IL-4Rα, inhibiendo simultáneamente las vías de IL-4 e IL-13."
-        },
-        {
-          q: "¿Cuál de estos anticuerpos monoclonales tiene como diana la citocina TSLP y es útil en asma grave con o sin biomarcadores T2?",
-          options: ["Tezepelumab", "Mepolizumab", "Benralizumab", "Dupilumab"],
-          answer: 0,
-          feedback: "Tezepelumab (Tezspire) bloquea TSLP por vía SC, abarcando pacientes con asma grave independientemente de su perfil T2."
-        },
-        {
-          q: "¿Qué anticuerpo monoclonal de administración subcutánea (SC) neutraliza directamente la interleucina 5 (IL-5) en el asma eosinofílica?",
-          options: ["Mepolizumab", "Omalizumab", "Tezepelumab", "Dupilumab"],
-          answer: 0,
-          feedback: "Mepolizumab (Nucala) se une directamente a la IL-5 circulante, reduciendo la activación y supervivencia de eosinófilos."
-        }
-      ],
-      extra: [
-        {
-          q: "¿Qué fármaco es un inhibidor selectivo de la fosfodiesterasa 4 (PDE-4) indicado principalmente en EPOC severo y bronquitis crónica?",
-          options: ["Roflumilast", "Sildenafil", "Cromolín", "Zileutón"],
-          answer: 0,
-          feedback: "Roflumilast eleva el AMPc intracelular, disminuyendo citocinas inflamatorias (TNF-α, IL-6, IL-8) y la hipersecreción de moco en bronquitis crónica."
-        },
-        {
-          q: "¿Qué par de fármacos estabiliza la membrana de los mastocitos (canales de Cl-) y tiene utilidad estrictamente profiláctica en asma estacional o por ejercicio?",
-          options: ["Cromolín y Nedocromil", "Montelukast y Zafirlukast", "Salmeterol y Formoterol", "Ipratropio y Tiotropio"],
-          answer: 0,
-          feedback: "Cromolín y nedocromil hiperpolarizan la membrana evitando la degranulación mastocitaria; no sirven una vez iniciada la crisis."
-        },
-        {
-          q: "¿Qué inhibidor de la fosfodiesterasa 5 (PDE-5) fue destacado en clase en neonatos cardiópatas con insuficiencia respiratoria para evitar la taquicardia de los β2?",
-          options: ["Sildenafil", "Roflumilast", "Teofilina", "Adrenalina"],
-          answer: 0,
-          feedback: "A dosis muy bajas en neonatología, el sildenafil ayuda a mejorar la perfusión/ventilación manteniendo AMPc sin provocar la estimulación cardíaca β1."
-        },
-        {
-          q: "¿Cuál de los siguientes fármacos es un antihistamínico H1 que puede complementar el componente alérgico, pero no basta frente a la 'sopa inflamatoria' del asma?",
-          options: ["Loratadina (o Clorfenamina)", "Fluticasona", "Omalizumab", "Montelukast"],
-          answer: 0,
-          feedback: "Los antihistamínicos H1 solo cubren la vía de la histamina; en el asma intervienen múltiples mediadores que requieren corticoides u otras terapias."
-        },
-        {
-          q: "¿Cuál de estos fármacos inhalados debe iniciarse meses antes de la primavera (julio–agosto) porque pierde utilidad si el mastocito ya se degranuló?",
-          options: ["Cromolín", "Salbutamol", "Adrenalina", "Hidrocortisona"],
-          answer: 0,
-          feedback: "El cromolín es estrictamente preventivo: estabiliza la membrana mastocitaria antes de la exposición al polen o ejercicio."
-        },
-        {
-          q: "En patología obstructiva crónica, el efecto antiinflamatorio de Roflumilast se potencia de manera complementaria al asociarlo con:",
-          options: ["Montelukast", "Atropina", "Efedrina", "Clorfenamina"],
-          answer: 0,
-          feedback: "La asociación de roflumilast (inhibidor PDE-4) con montelukast (antagonista CysLT1) suma mecanismos antiinflamatorios complementarios."
-        }
-const CLINICAL_CASES = {
-      broncodilatadores: [
         {
           q: "CASO CLÍNICO: Un niño asmático recibe salbutamol a las 8:00 AM con excelente respuesta, pero al repetir dosis al mediodía y en la tarde su saturación cae progresivamente pese a duplicar los puffs. ¿Qué fenómeno explica esta pérdida rápida de efecto?",
           options: [
@@ -711,6 +545,42 @@ const CLINICAL_CASES = {
       ],
       antiinflamatorios: [
         {
+          q: "¿Cuál de los siguientes glucocorticoides inhalados contiene flúor en su estructura, otorgándole mayor potencia, vida media más larga y mejor penetración tisular?",
+          options: ["Fluticasona", "Beclometasona", "Hidrocortisona", "Prednisona"],
+          answer: 0,
+          feedback: "La fluticasona es un glucocorticoide inhalado más potente y con mayor vida media que beclometasona o budesonida, ideal para cuadros con mayor inflamación."
+        },
+        {
+          q: "¿Qué glucocorticoide es de elección en urgencias por vía intravenosa para estabilizar a un paciente con crisis asmática grave y desaturación?",
+          options: ["Hidrocortisona", "Prednisona", "Budesonida", "Ciclesonida"],
+          answer: 0,
+          feedback: "En urgencias ante descompensación aguda se prefiere la vía intravenosa, por lo que hidrocortisona es la opción frente a prednisona (oral)."
+        },
+        {
+          q: "¿Cuál de estos glucocorticoides se caracteriza por ser un profármaco con alta unión a proteínas plasmáticas (UPP) y buen perfil en asma, aunque poco usado en Chile?",
+          options: ["Ciclesonida", "Fluticasona", "Triamcinolona", "Mometasona"],
+          answer: 0,
+          feedback: "La ciclesonida es un profármaco con alta UPP; en la práctica clínica local se utilizan con mayor frecuencia beclometasona, budesonida y fluticasona."
+        },
+        {
+          q: "¿Qué par de glucocorticoides inhalados cuenta con amplia trayectoria clínica, siendo el primero habitualmente elegido al iniciar terapia controladora?",
+          options: ["Beclometasona y Budesonida", "Salmeterol y Formoterol", "Zileutón y Montelukast", "Ipratropio y Tiotropio"],
+          answer: 0,
+          feedback: "Beclometasona y budesonida poseen un perfil de seguridad y eficacia bien establecido como base del manejo antiinflamatorio del asma."
+        },
+        {
+          q: "¿Cuál de los siguientes fármacos pertenece a los glucocorticoides que NO relajan directamente el músculo liso, pero aumentan la expresión génica de receptores β2?",
+          options: ["Mometasona", "Teofilina", "Salbutamol", "Benralizumab"],
+          answer: 0,
+          feedback: "Los glucocorticoides (como mometasona, budesonida o fluticasona) ejercen una acción permisiva sobre catecolaminas al incrementar los receptores β2."
+        },
+        {
+          q: "¿Cuál de estos fármacos corresponde a un glucocorticoide cuyo uso inhalatorio puede provocar candidiasis bucofaríngea y ronquera si se deposita en orofaringe?",
+          options: ["Triamcinolona", "Bromuro de ipratropio", "Zafirlukast", "Nedocromil"],
+          answer: 0,
+          feedback: "El depósito local de glucocorticoides inhalados causa inmunosupresión local (candidiasis) y engrosamiento de cuerdas vocales (ronquera); la aerocámara y el enjuague reducen este riesgo."
+        },
+        {
           q: "CASO CLÍNICO: Niño de 7 años usa su inhalador de fluticasona directo en la boca sin aerocámara ni enjuague posterior. Consulta por placas blanquecinas dolorosas en la mucosa oral. ¿Cuál es la complicación?",
           options: [
             "Candidiasis bucofaríngea por inmunosupresión local",
@@ -756,6 +626,47 @@ const CLINICAL_CASES = {
         }
       ],
       antimuscarinicos: [
+        {
+          q: "¿Qué antimuscarínico es un amonio cuaternario de vida media corta que, combinado con salbutamol, potencia la broncodilatación en asma grave?",
+          options: ["Bromuro de ipratropio", "Tiotropio", "Atropina", "Salmeterol"],
+          answer: 0,
+          feedback: "El bromuro de ipratropio bloquea receptores muscarínicos evitando la broncoconstricción colinérgica y es una buena alternativa en intolerantes a β2."
+        },
+        {
+          q: "¿Cuál de estos antimuscarínicos de acción prolongada (24 h con 18 µg) se disocia rápidamente del receptor M2, siendo más seguro a nivel cardíaco y muy útil en EPOC?",
+          options: ["Tiotropio", "Bromuro de ipratropio", "Atropina", "Teofilina"],
+          answer: 0,
+          feedback: "El tiotropio se une a M1, M2 y M3 pero se disocia rápido de M2, disminuyendo el riesgo de taquicardia refleja y reduciendo exacerbaciones en EPOC."
+        },
+        {
+          q: "¿Qué antagonista colinérgico no está disponible por vía inhalatoria y se evita en asma por producir xerostomía, midriasis, fotofobia y taquicardia sistémica?",
+          options: ["Atropina", "Tiotropio", "Bromuro de ipratropio", "Roflumilast"],
+          answer: 0,
+          feedback: "La atropina bloquea de forma no selectiva todos los receptores muscarínicos con vida media larga, generando importantes RAM anticolinérgicas sistémicas."
+        },
+        {
+          q: "Entre los antimuscarínicos inhalados, ¿cuál resulta más seguro frente al riesgo de taquicardia por bloqueo M2 en pacientes vulnerables?",
+          options: ["Tiotropio", "Atropina", "Adrenalina", "Isoproterenol"],
+          answer: 0,
+          feedback: "Al tener menor afinidad/disociación más rápida sobre M2 que ipratropio, el tiotropio conlleva menor riesgo de sobrecarga cardíaca."
+        },
+        {
+          q: "¿Qué antimuscarínico de acción corta debe evitarse en dosis altas en pacientes con IAM reciente debido a que puede pasar a sangre y bloquear receptores M2?",
+          options: ["Bromuro de ipratropio", "Montelukast", "Fluticasona", "Cromolín"],
+          answer: 0,
+          feedback: "En sobredosificación, el bromuro de ipratropio puede bloquear receptores M2 cardíacos, inhibiendo el tono vagal y desencadenando taquicardia."
+        },
+        {
+          q: "¿Cuál de las siguientes tríadas agrupa exclusivamente antagonistas competitivos de los receptores colinérgicos muscarínicos?",
+          options: [
+            "Atropina, Bromuro de ipratropio y Tiotropio",
+            "Salbutamol, Salmeterol y Formoterol",
+            "Montelukast, Zafirlukast y Zileutón",
+            "Beclometasona, Budesonida y Fluticasona"
+          ],
+          answer: 0,
+          feedback: "Los tres inhiben competitivamente receptores muscarínicos (M3 en vía aérea), impidiendo la broncoconstricción y el exceso de secreciones vagales."
+        },
         {
           q: "CASO CLÍNICO: Hombre de 68 años con EPOC avanzado y fuerte componente colinérgico necesita un antimuscarínico de mantención en dosis única diaria (cada 24 h) para reducir exacerbaciones. ¿Cuál se indica?",
           options: [
@@ -803,6 +714,42 @@ const CLINICAL_CASES = {
       ],
       leucotrienos: [
         {
+          q: "¿Qué fármaco inhibe la enzima 5-lipooxigenasa (5-LO), por lo que solo es útil en profilaxis crónica y NO revierte una crisis aguda ya instalada?",
+          options: ["Zileutón", "Montelukast", "Zafirlukast", "Pranlukast"],
+          answer: 0,
+          feedback: "Zileutón frena la síntesis de nuevos leucotrienos, pero no bloquea los mediadores que ya fueron liberados y están circulando en la vía aérea."
+        },
+        {
+          q: "¿Cuál es el antagonista del receptor de leucotrienos (CysLT1) más conocido, disponible en Chile y ampliamente utilizado en población pediátrica?",
+          options: ["Montelukast", "Zileutón", "Roflumilast", "Omalizumab"],
+          answer: 0,
+          feedback: "Montelukast actúa como 'corcho' bloqueando el receptor CysLT1, con fácil administración oral y muy pocos efectos adversos."
+        },
+        {
+          q: "Además de Montelukast, ¿qué otros dos fármacos actúan como antagonistas competitivos de los receptores CysLT1 de leucotrienos?",
+          options: ["Zafirlukast y Pranlukast", "Zileutón y Roflumilast", "Cromolín y Nedocromil", "Mepolizumab y Dupilumab"],
+          answer: 0,
+          feedback: "Montelukast, zafirlukast y pranlukast bloquean la unión de LTC4, LTD4 y LTE4 al receptor CysLT1."
+        },
+        {
+          q: "Ante un paciente con broncoconstricción donde los leucotrienos ya están circulando en sangre y vía aérea, ¿qué fármaco logra bloquear su acción directamente en el receptor?",
+          options: ["Montelukast", "Zileutón", "Cromolín", "Ciclesonida"],
+          answer: 0,
+          feedback: "A diferencia de los inhibidores enzimáticos (zileutón), un antagonista de receptor como montelukast impide que el mediador ya liberado ejerza su efecto."
+        },
+        {
+          q: "¿Qué fármaco inhibe de forma irreversible la ciclooxigenasa (COX), desviando el ácido araquidónico hacia la vía de los leucotrienos y gatillando asma iatrogénica?",
+          options: ["Ácido acetilsalicílico (Aspirina)", "Montelukast", "Zileutón", "Budesonida"],
+          answer: 0,
+          feedback: "El bloqueo irreversible de la COX por aspirina desvía el sustrato hacia la 5-lipooxigenasa, elevando la producción de leucotrienos broncoconstrictores."
+        },
+        {
+          q: "¿Qué par combina correctamente un inhibidor de la 5-lipooxigenasa y un antagonista del receptor CysLT1?",
+          options: ["Zileutón y Zafirlukast", "Montelukast y Pranlukast", "Teofilina y Aminofilina", "Salbutamol y Formoterol"],
+          answer: 0,
+          feedback: "Zileutón inhibe la enzima 5-LO, mientras que zafirlukast (al igual que montelukast y pranlukast) antagoniza el receptor CysLT1."
+        },
+        {
           q: "CASO CLÍNICO: Mujer de 34 años con asma toma ácido acetilsalicílico (aspirina) por cefalea y desencadena una crisis broncoobstructiva severa. ¿Cuál es el mecanismo fisiopatológico?",
           options: [
             "Inhibición irreversible de la COX que desvía el ácido araquidónico hacia la vía LOX (leucotrienos)",
@@ -848,6 +795,42 @@ const CLINICAL_CASES = {
         }
       ],
       monoclonales: [
+        {
+          q: "¿Cuál fue el primer anticuerpo monoclonal aprobado en asma alérgica grave, dirigido contra la IgE (vía SC) y capaz de reducir hospitalizaciones hasta en 88%?",
+          options: ["Omalizumab", "Mepolizumab", "Dupilumab", "Tezepelumab"],
+          answer: 0,
+          feedback: "Omalizumab (Xolair) impide la unión de la IgE a los receptores FcεRI/R2 en mastocitos y basófilos, reduciendo drásticamente las exacerbaciones."
+        },
+        {
+          q: "¿Qué anticuerpo monoclonal se dirige contra el receptor IL-5Rα induciendo destrucción de eosinófilos (ADCC) en asma eosinofílica grave?",
+          options: ["Benralizumab", "Omalizumab", "Dupilumab", "Tezepelumab"],
+          answer: 0,
+          feedback: "Benralizumab (Fasenra) se administra vía SC y bloquea IL-5Rα, promoviendo citotoxicidad dependiente de anticuerpos sobre eosinófilos."
+        },
+        {
+          q: "¿Cuál de los siguientes anticuerpos monoclonales anti-IL-5 se administra principalmente por vía intravenosa (IV) en adultos con asma eosinofílica?",
+          options: ["Reslizumab", "Mepolizumab", "Benralizumab", "Omalizumab"],
+          answer: 0,
+          feedback: "Reslizumab (Cinqaero/Cinqair) actúa contra IL-5 por vía IV, a diferencia de mepolizumab que es subcutáneo."
+        },
+        {
+          q: "¿Qué anticuerpo monoclonal subcutáneo bloquea IL-4Rα (vía IL-4/IL-13) y está indicado en el fenotipo de asma T2-high (eosinófilos y/o FeNO elevado)?",
+          options: ["Dupilumab", "Tezepelumab", "Reslizumab", "Omalizumab"],
+          answer: 0,
+          feedback: "Dupilumab (Dupixent) bloquea la subunidad compartida IL-4Rα, inhibiendo simultáneamente las vías de IL-4 e IL-13."
+        },
+        {
+          q: "¿Cuál de estos anticuerpos monoclonales tiene como diana la citocina TSLP y es útil en asma grave con o sin biomarcadores T2?",
+          options: ["Tezepelumab", "Mepolizumab", "Benralizumab", "Dupilumab"],
+          answer: 0,
+          feedback: "Tezepelumab (Tezspire) bloquea TSLP por vía SC, abarcando pacientes con asma grave independientemente de su perfil T2."
+        },
+        {
+          q: "¿Qué anticuerpo monoclonal de administración subcutánea (SC) neutraliza directamente la interleucina 5 (IL-5) en el asma eosinofílica?",
+          options: ["Mepolizumab", "Omalizumab", "Tezepelumab", "Dupilumab"],
+          answer: 0,
+          feedback: "Mepolizumab (Nucala) se une directamente a la IL-5 circulante, reduciendo la activación y supervivencia de eosinófilos."
+        },
         {
           q: "CASO CLÍNICO: Paciente con asma alérgica grave mediada por IgE que acumulaba 10 hospitalizaciones anuales pese a dosis altas de ICS + LABA inicia un biológico SC y reduce sus hospitalizaciones en 88%. ¿Qué fármaco recibió?",
           options: [
@@ -895,6 +878,42 @@ const CLINICAL_CASES = {
       ],
       extra: [
         {
+          q: "¿Qué fármaco es un inhibidor selectivo de la fosfodiesterasa 4 (PDE-4) indicado principalmente en EPOC severo y bronquitis crónica?",
+          options: ["Roflumilast", "Sildenafil", "Cromolín", "Zileutón"],
+          answer: 0,
+          feedback: "Roflumilast eleva el AMPc intracelular, disminuyendo citocinas inflamatorias (TNF-α, IL-6, IL-8) y la hipersecreción de moco en bronquitis crónica."
+        },
+        {
+          q: "¿Qué par de fármacos estabiliza la membrana de los mastocitos (canales de Cl-) y tiene utilidad estrictamente profiláctica en asma estacional o por ejercicio?",
+          options: ["Cromolín y Nedocromil", "Montelukast y Zafirlukast", "Salmeterol y Formoterol", "Ipratropio y Tiotropio"],
+          answer: 0,
+          feedback: "Cromolín y nedocromil hiperpolarizan la membrana evitando la degranulación mastocitaria; no sirven una vez iniciada la crisis."
+        },
+        {
+          q: "¿Qué inhibidor de la fosfodiesterasa 5 (PDE-5) fue destacado en clase en neonatos cardiópatas con insuficiencia respiratoria para evitar la taquicardia de los β2?",
+          options: ["Sildenafil", "Roflumilast", "Teofilina", "Adrenalina"],
+          answer: 0,
+          feedback: "A dosis muy bajas en neonatología, el sildenafil ayuda a mejorar la perfusión/ventilación manteniendo AMPc sin provocar la estimulación cardíaca β1."
+        },
+        {
+          q: "¿Cuál de los siguientes fármacos es un antihistamínico H1 que puede complementar el componente alérgico, pero no basta frente a la 'sopa inflamatoria' del asma?",
+          options: ["Loratadina (o Clorfenamina)", "Fluticasona", "Omalizumab", "Montelukast"],
+          answer: 0,
+          feedback: "Los antihistamínicos H1 solo cubren la vía de la histamina; en el asma intervienen múltiples mediadores que requieren corticoides u otras terapias."
+        },
+        {
+          q: "¿Cuál de estos fármacos inhalados debe iniciarse meses antes de la primavera (julio–agosto) porque pierde utilidad si el mastocito ya se degranuló?",
+          options: ["Cromolín", "Salbutamol", "Adrenalina", "Hidrocortisona"],
+          answer: 0,
+          feedback: "El cromolín es estrictamente preventivo: estabiliza la membrana mastocitaria antes de la exposición al polen o ejercicio."
+        },
+        {
+          q: "En patología obstructiva crónica, el efecto antiinflamatorio de Roflumilast se potencia de manera complementaria al asociarlo con:",
+          options: ["Montelukast", "Atropina", "Efedrina", "Clorfenamina"],
+          answer: 0,
+          feedback: "La asociación de roflumilast (inhibidor PDE-4) con montelukast (antagonista CysLT1) suma mecanismos antiinflamatorios complementarios."
+        },
+        {
           q: "CASO CLÍNICO: Recién nacido cardiópata complicado con insuficiencia respiratoria necesita mejorar su perfusión y ventilación pulmonar evitando la taquicardia de los agonistas β2. ¿Qué fármaco se prefiere a dosis muy bajas?",
           options: [
             "Sildenafil",
@@ -941,13 +960,6 @@ const CLINICAL_CASES = {
       ]
     };
 
-    // Fusionar automáticamente los casos clínicos en el banco principal
-    Object.keys(CLINICAL_CASES).forEach(cat => {
-      QUESTION_BANK[cat].push(...CLINICAL_CASES[cat]);
-    });
-      ]
-    };
-
     // Estado del juego
     const GOAL_SCORE = 1500;
     let score = 0;
@@ -976,6 +988,7 @@ const CLINICAL_CASES = {
 
     const questionModal = document.getElementById("questionModal");
     const modalCategory = document.getElementById("modalCategory");
+    const modalCaseBadge = document.getElementById("modalCaseBadge");
     const modalQuestion = document.getElementById("modalQuestion");
     const modalOptions = document.getElementById("modalOptions");
     const modalFeedback = document.getElementById("modalFeedback");
@@ -1135,7 +1148,13 @@ const CLINICAL_CASES = {
 
       modalCategory.textContent = category.name;
       modalCategory.style.background = category.color;
-      modalQuestion.textContent = qData.q;
+
+      const isCase = qData.q.startsWith("CASO CLÍNICO:");
+      modalCaseBadge.classList.toggle("show", isCase);
+      modalQuestion.textContent = isCase
+        ? qData.q.replace(/^CASO CLÍNICO:\s*/, "")
+        : qData.q;
+
       modalFeedback.className = "feedback-box";
       modalFeedback.textContent = "";
       continueBtn.className = "next-btn";
