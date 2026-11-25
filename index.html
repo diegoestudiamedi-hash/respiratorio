@@ -2,7 +2,8 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0f172a" />
   <title>FarmaRespira — Ruleta Preguntados</title>
   <style>
     :root {
@@ -23,16 +24,24 @@
       margin: 0;
       padding: 0;
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      width: 100%;
+      overflow-x: hidden;
     }
 
     body {
       background: radial-gradient(circle at top, #1e293b 0%, var(--bg) 70%);
       color: var(--text);
       min-height: 100vh;
+      min-height: 100dvh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 16px;
+      padding: 12px;
+      touch-action: manipulation;
     }
 
     header {
@@ -42,17 +51,16 @@
       flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
-      background: rgba(30, 41, 59, 0.85);
-      padding: 14px 20px;
+      gap: 10px;
+      margin-bottom: 14px;
+      background: rgba(30, 41, 59, 0.92);
+      padding: 12px 16px;
       border-radius: var(--radius);
       border: 1px solid rgba(148, 163, 184, 0.15);
-      backdrop-filter: blur(8px);
     }
 
     .title-group h1 {
-      font-size: 1.35rem;
+      font-size: 1.25rem;
       font-weight: 800;
       letter-spacing: -0.02em;
       background: linear-gradient(90deg, #38bdf8, #a78bfa);
@@ -61,26 +69,26 @@
     }
 
     .title-group p {
-      font-size: 0.82rem;
+      font-size: 0.78rem;
       color: var(--text-muted);
     }
 
     .stats {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 8px;
       flex-wrap: wrap;
     }
 
     .stat-pill {
       background: var(--bg);
-      padding: 6px 12px;
+      padding: 5px 10px;
       border-radius: 999px;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       font-weight: 700;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       border: 1px solid rgba(148, 163, 184, 0.2);
     }
 
@@ -89,7 +97,8 @@
 
     .controls-top {
       display: flex;
-      gap: 8px;
+      gap: 6px;
+      flex-wrap: wrap;
     }
 
     .icon-btn {
@@ -97,15 +106,16 @@
       color: var(--text);
       border: none;
       border-radius: 10px;
-      padding: 8px 12px;
-      font-size: 0.85rem;
-      font-weight: 600;
+      padding: 8px 11px;
+      font-size: 0.8rem;
+      font-weight: 700;
       cursor: pointer;
       transition: transform 0.15s, background 0.2s;
+      touch-action: manipulation;
     }
 
     .icon-btn:hover { background: #475569; }
-    .icon-btn:active { transform: scale(0.96); }
+    .icon-btn:active { transform: scale(0.95); }
     .icon-btn.active { background: var(--accent); color: #0f172a; }
 
     main {
@@ -114,7 +124,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 18px;
+      gap: 16px;
     }
 
     .wheel-stage {
@@ -123,51 +133,51 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      margin-top: 6px;
+      margin-top: 8px;
+      width: 100%;
     }
 
     .pointer {
       position: absolute;
-      top: -14px;
+      top: -12px;
       left: 50%;
       transform: translateX(-50%);
       width: 0;
       height: 0;
-      border-left: 16px solid transparent;
-      border-right: 16px solid transparent;
-      border-top: 30px solid var(--gold);
+      border-left: 14px solid transparent;
+      border-right: 14px solid transparent;
+      border-top: 26px solid var(--gold);
       filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
       z-index: 10;
     }
 
     canvas#wheel {
-      width: 340px;
-      height: 340px;
-      max-width: 86vw;
-      max-height: 86vw;
+      width: min(340px, 84vw);
+      height: min(340px, 84vw);
       border-radius: 50%;
-      box-shadow: 0 0 0 8px #334155, 0 18px 40px rgba(0, 0, 0, 0.55);
+      box-shadow: 0 0 0 7px #334155, 0 16px 36px rgba(0, 0, 0, 0.55);
       cursor: pointer;
+      touch-action: manipulation;
     }
 
     .spin-btn {
-      margin-top: 18px;
+      margin-top: 16px;
       background: linear-gradient(135deg, #38bdf8, #6366f1);
       color: white;
       border: none;
       padding: 14px 36px;
-      font-size: 1.05rem;
+      font-size: 1rem;
       font-weight: 800;
       border-radius: 999px;
       cursor: pointer;
       box-shadow: 0 8px 20px rgba(99, 102, 241, 0.35);
       transition: transform 0.15s, box-shadow 0.2s, opacity 0.2s;
       letter-spacing: 0.03em;
+      touch-action: manipulation;
     }
 
-    .spin-btn:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 24px rgba(99, 102, 241, 0.45);
+    .spin-btn:active:not(:disabled) {
+      transform: scale(0.97);
     }
 
     .spin-btn:disabled {
@@ -178,10 +188,10 @@
     .legend {
       width: 100%;
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
       gap: 8px;
-      background: rgba(30, 41, 59, 0.65);
-      padding: 14px;
+      background: rgba(30, 41, 59, 0.7);
+      padding: 12px 14px;
       border-radius: var(--radius);
       border: 1px solid rgba(148, 163, 184, 0.12);
     }
@@ -190,33 +200,32 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       color: var(--text-muted);
     }
 
     .legend-dot {
-      width: 12px;
-      height: 12px;
+      width: 11px;
+      height: 11px;
       border-radius: 50%;
       flex-shrink: 0;
     }
 
-    /* Modal de pregunta y resultados */
+    /* Modales */
     .modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(2, 6, 23, 0.82);
-      backdrop-filter: blur(6px);
+      background: rgba(2, 6, 23, 0.85);
       display: none;
       align-items: center;
       justify-content: center;
-      padding: 16px;
+      padding: 12px;
       z-index: 50;
     }
 
     .modal-backdrop.open {
       display: flex;
-      animation: fadeIn 0.2s ease-out;
+      animation: fadeIn 0.18s ease-out;
     }
 
     @keyframes fadeIn {
@@ -226,26 +235,15 @@
 
     .modal-card {
       width: 100%;
-      max-width: 580px;
+      max-width: 560px;
       background: var(--surface);
       border-radius: 20px;
-      padding: 24px;
+      padding: 20px;
       border: 1px solid rgba(148, 163, 184, 0.2);
       box-shadow: 0 24px 50px rgba(0, 0, 0, 0.6);
-      max-height: 92vh;
+      max-height: 90dvh;
       overflow-y: auto;
-    }
-
-    .category-badge {
-      display: inline-block;
-      padding: 6px 14px;
-      border-radius: 999px;
-      font-size: 0.8rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: #fff;
-      margin-bottom: 14px;
+      -webkit-overflow-scrolling: touch;
     }
 
     .badge-row {
@@ -253,18 +251,25 @@
       align-items: center;
       gap: 8px;
       flex-wrap: wrap;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
 
-    .badge-row .category-badge {
-      margin-bottom: 0;
+    .category-badge {
+      display: inline-block;
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #fff;
     }
 
     .case-badge {
       display: none;
-      padding: 5px 12px;
+      padding: 5px 11px;
       border-radius: 999px;
-      font-size: 0.78rem;
+      font-size: 0.75rem;
       font-weight: 800;
       letter-spacing: 0.03em;
       background: rgba(56, 189, 248, 0.16);
@@ -277,10 +282,10 @@
     }
 
     .question-text {
-      font-size: 1.12rem;
-      line-height: 1.5;
+      font-size: 1.04rem;
+      line-height: 1.48;
       font-weight: 600;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
     }
 
     .options-list {
@@ -294,13 +299,15 @@
       text-align: left;
       background: var(--bg);
       color: var(--text);
-      border: 2px solid rgba(148, 163, 184, 0.2);
+      border: 2px solid rgba(148, 163, 184, 0.22);
       border-radius: 12px;
-      padding: 13px 16px;
-      font-size: 0.96rem;
+      padding: 13px 14px;
+      font-size: 0.94rem;
       font-weight: 600;
+      line-height: 1.35;
       cursor: pointer;
-      transition: border-color 0.15s, background 0.15s, transform 0.1s;
+      transition: border-color 0.15s, background 0.15s;
+      touch-action: manipulation;
     }
 
     .option-btn:hover:not(:disabled) {
@@ -323,13 +330,13 @@
     .option-btn:disabled { cursor: default; }
 
     .feedback-box {
-      margin-top: 16px;
-      padding: 14px 16px;
+      margin-top: 14px;
+      padding: 12px 14px;
       border-radius: 12px;
-      background: rgba(15, 23, 42, 0.75);
+      background: rgba(15, 23, 42, 0.78);
       border-left: 4px solid var(--accent);
-      font-size: 0.9rem;
-      line-height: 1.48;
+      font-size: 0.88rem;
+      line-height: 1.45;
       color: #e2e8f0;
       display: none;
     }
@@ -337,7 +344,7 @@
     .feedback-box.show { display: block; }
 
     .modal-footer {
-      margin-top: 18px;
+      margin-top: 16px;
       display: flex;
       justify-content: flex-end;
     }
@@ -347,11 +354,13 @@
       color: #0f172a;
       border: none;
       border-radius: 10px;
-      padding: 11px 22px;
+      padding: 12px 24px;
       font-size: 0.95rem;
       font-weight: 800;
       cursor: pointer;
       display: none;
+      width: 100%;
+      touch-action: manipulation;
     }
 
     .next-btn.show { display: inline-block; }
@@ -359,27 +368,46 @@
     .summary-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin: 18px 0;
+      gap: 8px;
+      margin: 16px 0;
     }
 
     .summary-item {
       background: var(--bg);
-      padding: 12px;
+      padding: 10px 6px;
       border-radius: 12px;
       text-align: center;
     }
 
     .summary-item span {
       display: block;
-      font-size: 1.4rem;
+      font-size: 1.25rem;
       font-weight: 800;
       color: var(--gold);
     }
 
     .summary-item small {
       color: var(--text-muted);
-      font-size: 0.78rem;
+      font-size: 0.75rem;
+    }
+
+    /* Ajustes específicos para móvil */
+    @media (max-width: 540px) {
+      header {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+      }
+      .stats, .controls-top {
+        justify-content: center;
+      }
+      .spin-btn {
+        width: 100%;
+        max-width: 300px;
+      }
+      .legend {
+        grid-template-columns: repeat(2, 1fr);
+      }
     }
   </style>
 </head>
@@ -387,7 +415,7 @@
   <header>
     <div class="title-group">
       <h1>FarmaRespira</h1>
-      <p>Ruleta de Farmacología del Aparato Respiratorio</p>
+      <p>Farmacología del Aparato Respiratorio</p>
     </div>
     <div class="stats">
       <div class="stat-pill" id="livesDisplay" title="Vidas restantes">❤️❤️❤️</div>
@@ -396,6 +424,7 @@
     </div>
     <div class="controls-top">
       <button class="icon-btn" id="studyModeBtn" title="Jugar sin perder vidas">Modo Estudio</button>
+      <button class="icon-btn" id="casesOnlyBtn" title="Mostrar solo casos clínicos">🩺 Solo Casos</button>
       <button class="icon-btn" id="soundBtn" title="Activar/desactivar sonido">🔊</button>
       <button class="icon-btn" id="resetBtn" title="Reiniciar partida">↺</button>
     </div>
@@ -430,8 +459,8 @@
   <!-- Modal de Fin de Partida -->
   <div class="modal-backdrop" id="endModal">
     <div class="modal-card" style="text-align: center;">
-      <h2 id="endTitle" style="font-size: 1.6rem; margin-bottom: 8px;">¡Partida terminada!</h2>
-      <p id="endSubtitle" style="color: var(--text-muted); font-size: 0.95rem;"></p>
+      <h2 id="endTitle" style="font-size: 1.5rem; margin-bottom: 8px;">¡Partida terminada!</h2>
+      <p id="endSubtitle" style="color: var(--text-muted); font-size: 0.92rem;"></p>
       <div class="summary-grid">
         <div class="summary-item">
           <span id="finalScore">0</span>
@@ -969,6 +998,7 @@
     let totalAnswered = 0;
     let totalCorrect = 0;
     let studyMode = false;
+    let casesOnly = false;
     let soundEnabled = true;
     let isSpinning = false;
     let currentAngle = 0;
@@ -982,6 +1012,7 @@
     const scoreDisplay = document.getElementById("scoreDisplay");
     const streakDisplay = document.getElementById("streakDisplay");
     const studyModeBtn = document.getElementById("studyModeBtn");
+    const casesOnlyBtn = document.getElementById("casesOnlyBtn");
     const soundBtn = document.getElementById("soundBtn");
     const resetBtn = document.getElementById("resetBtn");
     const legendEl = document.getElementById("legend");
@@ -1002,12 +1033,15 @@
     const finalBestStreak = document.getElementById("finalBestStreak");
     const playAgainBtn = document.getElementById("playAgainBtn");
 
-    // Audio simple con Web Audio API
+    // Audio seguro para móviles (iOS/Android)
     let audioCtx = null;
     function playTone(freq, duration = 0.08, type = "sine", vol = 0.08) {
       if (!soundEnabled) return;
       try {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) return;
+        if (!audioCtx) audioCtx = new AudioContextClass();
+        if (audioCtx.state === "suspended") audioCtx.resume();
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         osc.type = type;
@@ -1044,7 +1078,6 @@
         const start = currentAngle + i * arc;
         const end = start + arc;
 
-        // Sector
         ctx.beginPath();
         ctx.moveTo(cx, cy);
         ctx.arc(cx, cy, radius, start, end);
@@ -1055,7 +1088,6 @@
         ctx.strokeStyle = "#0f172a";
         ctx.stroke();
 
-        // Etiqueta
         ctx.save();
         ctx.translate(cx, cy);
         ctx.rotate(start + arc / 2);
@@ -1068,7 +1100,6 @@
         ctx.restore();
       });
 
-      // Centro decorativo
       ctx.beginPath();
       ctx.arc(cx, cy, 42, 0, 2 * Math.PI);
       ctx.fillStyle = "#0f172a";
@@ -1097,7 +1128,7 @@
 
       const extraSpins = 5 + Math.random() * 4;
       const targetAngle = currentAngle + extraSpins * 2 * Math.PI + Math.random() * 2 * Math.PI;
-      const duration = 3600;
+      const duration = 3400;
       const startTime = performance.now();
       const startAngle = currentAngle;
       let lastSector = -1;
@@ -1109,7 +1140,6 @@
         currentAngle = startAngle + (targetAngle - startAngle) * eased;
         drawWheel();
 
-        // Sonido tick al cambiar de sector
         const arc = (2 * Math.PI) / CATEGORIES.length;
         const pointerAngle = (3 * Math.PI / 2 - (currentAngle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
         const sector = Math.floor(pointerAngle / arc) % CATEGORIES.length;
@@ -1123,7 +1153,7 @@
         } else {
           currentAngle %= 2 * Math.PI;
           isSpinning = false;
-          setTimeout(() => openQuestion(CATEGORIES[sector]), 350);
+          setTimeout(() => openQuestion(CATEGORIES[sector]), 320);
         }
       }
 
@@ -1131,15 +1161,20 @@
     }
 
     function getNextQuestion(categoryId) {
-      const bank = QUESTION_BANK[categoryId];
-      if (!usedIndices[categoryId] || usedIndices[categoryId].length >= bank.length) {
-        usedIndices[categoryId] = [];
+      const fullBank = QUESTION_BANK[categoryId];
+      const bank = casesOnly
+        ? fullBank.filter(item => item.q.startsWith("CASO CLÍNICO:"))
+        : fullBank;
+
+      const key = `${categoryId}_${casesOnly ? "cases" : "all"}`;
+      if (!usedIndices[key] || usedIndices[key].length >= bank.length) {
+        usedIndices[key] = [];
       }
       const available = bank
         .map((_, idx) => idx)
-        .filter(idx => !usedIndices[categoryId].includes(idx));
+        .filter(idx => !usedIndices[key].includes(idx));
       const chosenIdx = available[Math.floor(Math.random() * available.length)];
-      usedIndices[categoryId].push(chosenIdx);
+      usedIndices[key].push(chosenIdx);
       return bank[chosenIdx];
     }
 
@@ -1159,7 +1194,6 @@
       modalFeedback.textContent = "";
       continueBtn.className = "next-btn";
 
-      // Mezclar alternativas manteniendo índice correcto
       const indexedOptions = qData.options.map((text, idx) => ({
         text,
         isCorrect: idx === qData.answer
@@ -1264,6 +1298,11 @@
       studyMode = !studyMode;
       studyModeBtn.classList.toggle("active", studyMode);
       updateHUD();
+    });
+
+    casesOnlyBtn.addEventListener("click", () => {
+      casesOnly = !casesOnly;
+      casesOnlyBtn.classList.toggle("active", casesOnly);
     });
 
     soundBtn.addEventListener("click", () => {
