@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FarmaRespira — Ruleta Preguntados</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --surface-light: #334155;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --correct: #22c55e;
+      --wrong: #ef4444;
+      --gold: #fbbf24;
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top, #1e293b 0%, var(--bg) 70%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px;
+    }
+
+    header {
+      width: 100%;
+      max-width: 760px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      background: rgba(30, 41, 59, 0.85);
+      padding: 14px 20px;
+      border-radius: var(--radius);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      backdrop-filter: blur(8px);
+    }
+
+    .title-group h1 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(90deg, #38bdf8, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .title-group p {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .stats {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .stat-pill {
+      background: var(--bg);
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+
+    .stat-pill.score { color: var(--gold); }
+    .stat-pill.streak { color: #fb923c; }
+
+    .controls-top {
+      display: flex;
+      gap: 8px;
+    }
+
+    .icon-btn {
+      background: var(--surface-light);
+      color: var(--text);
+      border: none;
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.15s, background 0.2s;
+    }
+
+    .icon-btn:hover { background: #475569; }
+    .icon-btn:active { transform: scale(0.96); }
+    .icon-btn.active { background: var(--accent); color: #0f172a; }
+
+    main {
+      width: 100%;
+      max-width: 760px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .wheel-stage {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-top: 6px;
+    }
+
+    .pointer {
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 16px solid transparent;
+      border-right: 16px solid transparent;
+      border-top: 30px solid var(--gold);
+      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
+      z-index: 10;
+    }
+
+    canvas#wheel {
+      width: 340px;
+      height: 340px;
+      max-width: 86vw;
+      max-height: 86vw;
+      border-radius: 50%;
+      box-shadow: 0 0 0 8px #334155, 0 18px 40px rgba(0, 0, 0, 0.55);
+      cursor: pointer;
+    }
+
+    .spin-btn {
+      margin-top: 18px;
+      background: linear-gradient(135deg, #38bdf8, #6366f1);
+      color: white;
+      border: none;
+      padding: 14px 36px;
+      font-size: 1.05rem;
+      font-weight: 800;
+      border-radius: 999px;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(99, 102, 241, 0.35);
+      transition: transform 0.15s, box-shadow 0.2s, opacity 0.2s;
+      letter-spacing: 0.03em;
+    }
+
+    .spin-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px rgba(99, 102, 241, 0.45);
+    }
+
+    .spin-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .legend {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 8px;
+      background: rgba(30, 41, 59, 0.65);
+      padding: 14px;
+      border-radius: var(--radius);
+      border: 1px solid rgba(148, 163, 184, 0.12);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* Modal de pregunta y resultados */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.82);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 50;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal-card {
+      width: 100%;
+      max-width: 580px;
+      background: var(--surface);
+      border-radius: 20px;
+      padding: 24px;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      box-shadow: 0 24px 50px rgba(0, 0, 0, 0.6);
+      max-height: 92vh;
+      overflow-y: auto;
+    }
+
+    .category-badge {
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #fff;
+      margin-bottom: 14px;
+    }
+
+    .question-text {
+      font-size: 1.12rem;
+      line-height: 1.5;
+      font-weight: 600;
+      margin-bottom: 18px;
+    }
+
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      width: 100%;
+      text-align: left;
+      background: var(--bg);
+      color: var(--text);
+      border: 2px solid rgba(148, 163, 184, 0.2);
+      border-radius: 12px;
+      padding: 13px 16px;
+      font-size: 0.96rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s, transform 0.1s;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: var(--accent);
+      background: #172554;
+    }
+
+    .option-btn.correct {
+      background: rgba(34, 197, 94, 0.18);
+      border-color: var(--correct);
+      color: #86efac;
+    }
+
+    .option-btn.wrong {
+      background: rgba(239, 68, 68, 0.18);
+      border-color: var(--wrong);
+      color: #fca5a5;
+    }
+
+    .option-btn:disabled { cursor: default; }
+
+    .feedback-box {
+      margin-top: 16px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.75);
+      border-left: 4px solid var(--accent);
+      font-size: 0.9rem;
+      line-height: 1.48;
+      color: #e2e8f0;
+      display: none;
+    }
+
+    .feedback-box.show { display: block; }
+
+    .modal-footer {
+      margin-top: 18px;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .next-btn {
+      background: var(--accent);
+      color: #0f172a;
+      border: none;
+      border-radius: 10px;
+      padding: 11px 22px;
+      font-size: 0.95rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: none;
+    }
+
+    .next-btn.show { display: inline-block; }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 18px 0;
+    }
+
+    .summary-item {
+      background: var(--bg);
+      padding: 12px;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .summary-item span {
+      display: block;
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--gold);
+    }
+
+    .summary-item small {
+      color: var(--text-muted);
+      font-size: 0.78rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="title-group">
+      <h1>FarmaRespira</h1>
+      <p>Ruleta de Farmacología del Aparato Respiratorio</p>
+    </div>
+    <div class="stats">
+      <div class="stat-pill" id="livesDisplay" title="Vidas restantes">❤️❤️❤️</div>
+      <div class="stat-pill score">⭐ <span id="scoreDisplay">0</span> / 1500</div>
+      <div class="stat-pill streak">🔥 <span id="streakDisplay">0</span></div>
+    </div>
+    <div class="controls-top">
+      <button class="icon-btn" id="studyModeBtn" title="Jugar sin perder vidas">Modo Estudio</button>
+      <button class="icon-btn" id="soundBtn" title="Activar/desactivar sonido">🔊</button>
+      <button class="icon-btn" id="resetBtn" title="Reiniciar partida">↺</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="wheel-stage">
+      <div class="pointer"></div>
+      <canvas id="wheel" width="520" height="520"></canvas>
+      <button class="spin-btn" id="spinBtn">GIRAR RULETA</button>
+    </div>
+
+    <section class="legend" id="legend"></section>
+  </main>
+
+  <!-- Modal de Pregunta -->
+  <div class="modal-backdrop" id="questionModal">
+    <div class="modal-card">
+      <span class="category-badge" id="modalCategory">Categoría</span>
+      <p class="question-text" id="modalQuestion"></p>
+      <div class="options-list" id="modalOptions"></div>
+      <div class="feedback-box" id="modalFeedback"></div>
+      <div class="modal-footer">
+        <button class="next-btn" id="continueBtn">Continuar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Fin de Partida -->
+  <div class="modal-backdrop" id="endModal">
+    <div class="modal-card" style="text-align: center;">
+      <h2 id="endTitle" style="font-size: 1.6rem; margin-bottom: 8px;">¡Partida terminada!</h2>
+      <p id="endSubtitle" style="color: var(--text-muted); font-size: 0.95rem;"></p>
+      <div class="summary-grid">
+        <div class="summary-item">
+          <span id="finalScore">0</span>
+          <small>Puntaje</small>
+        </div>
+        <div class="summary-item">
+          <span id="finalAccuracy">0%</span>
+          <small>Precisión</small>
+        </div>
+        <div class="summary-item">
+          <span id="finalBestStreak">0</span>
+          <small>Mejor racha</small>
+        </div>
+      </div>
+      <button class="spin-btn" id="playAgainBtn">Jugar de nuevo</button>
+    </div>
+  </div>
+
+  <script>
+    const CATEGORIES = [
+      { id: "broncodilatadores", name: "Broncodilatadores", short: "Broncodil.", color: "#ef4444" },
+      { id: "antiinflamatorios", name: "Antiinflamatorios", short: "Antiinflam.", color: "#10b981" },
+      { id: "antimuscarinicos", name: "Antimuscarínicos", short: "Antimusc.", color: "#0ea5e9" },
+      { id: "leucotrienos", name: "Inhibidores de Leucotrienos", short: "Inh. LT", color: "#f59e0b" },
+      { id: "monoclonales", name: "Monoclonales", short: "Monoclon.", color: "#8b5cf6" },
+      { id: "extra", name: "Extra", short: "Extra", color: "#ec4899" }
+    ];
+
+    const QUESTION_BANK = {
+      broncodilatadores: [
+        {
+          q: "¿Cuál de los siguientes fármacos es un agonista β2 selectivo de acción corta (SABA) usado como rescate en crisis asmática, con efecto de 4 a 6 horas?",
+          options: ["Salbutamol (Albuterol)", "Salmeterol", "Formoterol", "Tiotropio"],
+          answer: 0,
+          feedback: "El salbutamol es un SABA de rescate; puede producir temblor fino, hipocalemia y taquifilaxia por desacoplamiento de receptores β2."
+        },
+        {
+          q: "¿Qué par de fármacos corresponde a agonistas β2 de acción prolongada (LABA), caracterizados por su mayor liposolubilidad y dosificación cada 12 horas?",
+          options: ["Salmeterol y Formoterol", "Salbutamol y Terbutalina", "Adrenalina y Efedrina", "Budesonida y Fluticasona"],
+          answer: 0,
+          feedback: "Salmeterol y formoterol tienen cadenas más largas y mayor liposolubilidad, lo que prolonga su permanencia en el tejido pulmonar y mejora la adherencia."
+        },
+        {
+          q: "¿Qué fármaco corresponde a dos moléculas de teofilina unidas por un enlace éster que se escinde en sangre por acción de esterasas?",
+          options: ["Aminofilina", "Teobromina", "Cafeína", "Roflumilast"],
+          answer: 0,
+          feedback: "250 mg de aminofilina equivalen aproximadamente a 500 mg de teofilina, siendo esta última la molécula activa."
+        },
+        {
+          q: "¿Cuál de las siguientes metilxantinas tiene un estrecho margen terapéutico (10–15 µg/mL), inhibe la fosfodiesterasa, bloquea adenosina y NO desarrolla tolerancia?",
+          options: ["Teofilina", "Salbutamol", "Bromuro de ipratropio", "Montelukast"],
+          answer: 0,
+          feedback: "La teofilina mantiene eficacia estable sin tolerancia y ayuda contra la fatiga diafragmática en EPOC, pero >30–40 µg/mL provoca arritmias y convulsiones."
+        },
+        {
+          q: "¿Cuál de estos agonistas adrenérgicos no selectivos es el fármaco de rescate en shock anafiláctico con broncoconstricción, pero está contraindicado en angina o IAM reciente?",
+          options: ["Adrenalina", "Salbutamol", "Formoterol", "Beclometasona"],
+          answer: 0,
+          feedback: "La adrenalina activa receptores α y β, logrando broncodilatación máxima en ~15 min, pero aumenta el consumo de oxígeno miocárdico."
+        },
+        {
+          q: "¿Qué agonista adrenérgico de acción mixta derivado de una planta se utilizaba en jarabes respiratorios y fue abandonado por sus efectos adversos cardiovasculares?",
+          options: ["Efedrina", "Terbutalina", "Metaproterenol", "Cromolín"],
+          answer: 0,
+          feedback: "La efedrina actúa sobre receptores adrenérgicos y además favorece la liberación de noradrenalina, elevando el riesgo cardiovascular."
+        }
+      ],
+      antiinflamatorios: [
+        {
+          q: "¿Cuál de los siguientes glucocorticoides inhalados contiene flúor en su estructura, otorgándole mayor potencia, vida media más larga y mejor penetración tisular?",
+          options: ["Fluticasona", "Beclometasona", "Hidrocortisona", "Prednisona"],
+          answer: 0,
+          feedback: "La fluticasona es un glucocorticoide inhalado más potente y con mayor vida media que beclometasona o budesonida, ideal para cuadros con mayor inflamación."
+        },
+        {
+          q: "¿Qué glucocorticoide es de elección en urgencias por vía intravenosa para estabilizar a un paciente con crisis asmática grave y desaturación?",
+          options: ["Hidrocortisona", "Prednisona", "Budesonida", "Ciclesonida"],
+          answer: 0,
+          feedback: "En urgencias ante descompensación aguda se prefiere la vía intravenosa, por lo que hidrocortisona es la opción frente a prednisona (oral)."
+        },
+        {
+          q: "¿Cuál de estos glucocorticoides se caracteriza por ser un profármaco con alta unión a proteínas plasmáticas (UPP) y buen perfil en asma, aunque poco usado en Chile?",
+          options: ["Ciclesonida", "Fluticasona", "Triamcinolona", "Mometasona"],
+          answer: 0,
+          feedback: "La ciclesonida es un profármaco con alta UPP; en la práctica clínica local se utilizan con mayor frecuencia beclometasona, budesonida y fluticasona."
+        },
+        {
+          q: "¿Qué par de glucocorticoides inhalados cuenta con amplia trayectoria clínica, siendo el primero habitualmente elegido al iniciar terapia controladora?",
+          options: ["Beclometasona y Budesonida", "Salmeterol y Formoterol", "Zileutón y Montelukast", "Ipratropio y Tiotropio"],
+          answer: 0,
+          feedback: "Beclometasona y budesonida poseen un perfil de seguridad y eficacia bien establecido como base del manejo antiinflamatorio del asma."
+        },
+        {
+          q: "¿Cuál de los siguientes fármacos pertenece a los glucocorticoides que NO relajan directamente el músculo liso, pero aumentan la expresión génica de receptores β2?",
+          options: ["Mometasona", "Teofilina", "Salbutamol", "Benralizumab"],
+          answer: 0,
+          feedback: "Los glucocorticoides (como mometasona, budesonida o fluticasona) ejercen una acción permisiva sobre catecolaminas al incrementar los receptores β2."
+        },
+        {
+          q: "¿Cuál de estos fármacos corresponde a un glucocorticoide cuyo uso inhalatorio puede provocar candidiasis bucofaríngea y ronquera si se deposita en orofaringe?",
+          options: ["Triamcinolona", "Bromuro de ipratropio", "Zafirlukast", "Nedocromil"],
+          answer: 0,
+          feedback: "El depósito local de glucocorticoides inhalados causa inmunosupresión local (candidiasis) y engrosamiento de cuerdas vocales (ronquera); la aerocámara y el enjuague reducen este riesgo."
+        }
+      ],
+      antimuscarinicos: [
+        {
+          q: "¿Qué antimuscarínico es un amonio cuaternario de vida media corta que, combinado con salbutamol, potencia la broncodilatación en asma grave?",
+          options: ["Bromuro de ipratropio", "Tiotropio", "Atropina", "Salmeterol"],
+          answer: 0,
+          feedback: "El bromuro de ipratropio bloquea receptores muscarínicos evitando la broncoconstricción colinérgica y es una buena alternativa en intolerantes a β2."
+        },
+        {
+          q: "¿Cuál de estos antimuscarínicos de acción prolongada (24 h con 18 µg) se disocia rápidamente del receptor M2, siendo más seguro a nivel cardíaco y muy útil en EPOC?",
+          options: ["Tiotropio", "Bromuro de ipratropio", "Atropina", "Teofilina"],
+          answer: 0,
+          feedback: "El tiotropio se une a M1, M2 y M3 pero se disocia rápido de M2, disminuyendo el riesgo de taquicardia refleja y reduciendo exacerbaciones en EPOC."
+        },
+        {
+          q: "¿Qué antagonista colinérgico no está disponible por vía inhalatoria y se evita en asma por producir xerostomía, midriasis, fotofobia y taquicardia sistémica?",
+          options: ["Atropina", "Tiotropio", "Bromuro de ipratropio", "Roflumilast"],
+          answer: 0,
+          feedback: "La atropina bloquea de forma no selectiva todos los receptores muscarínicos con vida media larga, generando importantes RAM anticolinérgicas sistémicas."
+        },
+        {
+          q: "Entre los antimuscarínicos inhalados, ¿cuál resulta más seguro frente al riesgo de taquicardia por bloqueo M2 en pacientes vulnerables?",
+          options: ["Tiotropio", "Atropina", "Adrenalina", "Isoproterenol"],
+          answer: 0,
+          feedback: "Al tener menor afinidad/disociación más rápida sobre M2 que ipratropio, el tiotropio conlleva menor riesgo de sobrecarga cardíaca."
+        },
+        {
+          q: "¿Qué antimuscarínico de acción corta debe evitarse en dosis altas en pacientes con IAM reciente debido a que puede pasar a sangre y bloquear receptores M2?",
+          options: ["Bromuro de ipratropio", "Montelukast", "Fluticasona", "Cromolín"],
+          answer: 0,
+          feedback: "En sobredosificación, el bromuro de ipratropio puede bloquear receptores M2 cardíacos, inhibiendo el tono vagal y desencadenando taquicardia."
+        },
+        {
+          q: "¿Cuál de las siguientes tríadas agrupa exclusivamente antagonistas competitivos de los receptores colinérgicos muscarínicos?",
+          options: [
+            "Atropina, Bromuro de ipratropio y Tiotropio",
+            "Salbutamol, Salmeterol y Formoterol",
+            "Montelukast, Zafirlukast y Zileutón",
+            "Beclometasona, Budesonida y Fluticasona"
+          ],
+          answer: 0,
+          feedback: "Los tres inhiben competitivamente receptores muscarínicos (M3 en vía aérea), impidiendo la broncoconstricción y el exceso de secreciones vagales."
+        }
+      ],
+      leucotrienos: [
+        {
+          q: "¿Qué fármaco inhibe la enzima 5-lipooxigenasa (5-LO), por lo que solo es útil en profilaxis crónica y NO revierte una crisis aguda ya instalada?",
+          options: ["Zileutón", "Montelukast", "Zafirlukast", "Pranlukast"],
+          answer: 0,
+          feedback: "Zileutón frena la síntesis de nuevos leucotrienos, pero no bloquea los mediadores que ya fueron liberados y están circulando en la vía aérea."
+        },
+        {
+          q: "¿Cuál es el antagonista del receptor de leucotrienos (CysLT1) más conocido, disponible en Chile y ampliamente utilizado en población pediátrica?",
+          options: ["Montelukast", "Zileutón", "Roflumilast", "Omalizumab"],
+          answer: 0,
+          feedback: "Montelukast actúa como 'corcho' bloqueando el receptor CysLT1, con fácil administración oral y muy pocos efectos adversos."
+        },
+        {
+          q: "Además de Montelukast, ¿qué otros dos fármacos actúan como antagonistas competitivos de los receptores CysLT1 de leucotrienos?",
+          options: ["Zafirlukast y Pranlukast", "Zileutón y Roflumilast", "Cromolín y Nedocromil", "Mepolizumab y Dupilumab"],
+          answer: 0,
+          feedback: "Montelukast, zafirlukast y pranlukast bloquean la unión de LTC4, LTD4 y LTE4 al receptor CysLT1."
+        },
+        {
+          q: "Ante un paciente con broncoconstricción donde los leucotrienos ya están circulando en sangre y vía aérea, ¿qué fármaco logra bloquear su acción directamente en el receptor?",
+          options: ["Montelukast", "Zileutón", "Cromolín", "Ciclesonida"],
+          answer: 0,
+          feedback: "A diferencia de los inhibidores enzimáticos (zileutón), un antagonista de receptor como montelukast impide que el mediador ya liberado ejerza su efecto."
+        },
+        {
+          q: "¿Qué fármaco inhibe de forma irreversible la ciclooxigenasa (COX), desviando el ácido araquidónico hacia la vía de los leucotrienos y gatillando asma iatrogénica?",
+          options: ["Ácido acetilsalicílico (Aspirina)", "Montelukast", "Zileutón", "Budesonida"],
+          answer: 0,
+          feedback: "El bloqueo irreversible de la COX por aspirina desvía el sustrato hacia la 5-lipooxigenasa, elevando la producción de leucotrienos broncoconstrictores."
+        },
+        {
+          q: "¿Qué par combina correctamente un inhibidor de la 5-lipooxigenasa y un antagonista del receptor CysLT1?",
+          options: ["Zileutón y Zafirlukast", "Montelukast y Pranlukast", "Teofilina y Aminofilina", "Salbutamol y Formoterol"],
+          answer: 0,
+          feedback: "Zileutón inhibe la enzima 5-LO, mientras que zafirlukast (al igual que montelukast y pranlukast) antagoniza el receptor CysLT1."
+        }
+      ],
+      monoclonales: [
+        {
+          q: "¿Cuál fue el primer anticuerpo monoclonal aprobado en asma alérgica grave, dirigido contra la IgE (vía SC) y capaz de reducir hospitalizaciones hasta en 88%?",
+          options: ["Omalizumab", "Mepolizumab", "Dupilumab", "Tezepelumab"],
+          answer: 0,
+          feedback: "Omalizumab (Xolair) impide la unión de la IgE a los receptores FcεRI/R2 en mastocitos y basófilos, reduciendo drásticamente las exacerbaciones."
+        },
+        {
+          q: "¿Qué anticuerpo monoclonal se dirige contra el receptor IL-5Rα induciendo destrucción de eosinófilos (ADCC) en asma eosinofílica grave?",
+          options: ["Benralizumab", "Omalizumab", "Dupilumab", "Tezepelumab"],
+          answer: 0,
+          feedback: "Benralizumab (Fasenra) se administra vía SC y bloquea IL-5Rα, promoviendo citotoxicidad dependiente de anticuerpos sobre eosinófilos."
+        },
+        {
+          q: "¿Cuál de los siguientes anticuerpos monoclonales anti-IL-5 se administra principalmente por vía intravenosa (IV) en adultos con asma eosinofílica?",
+          options: ["Reslizumab", "Mepolizumab", "Benralizumab", "Omalizumab"],
+          answer: 0,
+          feedback: "Reslizumab (Cinqaero/Cinqair) actúa contra IL-5 por vía IV, a diferencia de mepolizumab que es subcutáneo."
+        },
+        {
+          q: "¿Qué anticuerpo monoclonal subcutáneo bloquea IL-4Rα (vía IL-4/IL-13) y está indicado en el fenotipo de asma T2-high (eosinófilos y/o FeNO elevado)?",
+          options: ["Dupilumab", "Tezepelumab", "Reslizumab", "Omalizumab"],
+          answer: 0,
+          feedback: "Dupilumab (Dupixent) bloquea la subunidad compartida IL-4Rα, inhibiendo simultáneamente las vías de IL-4 e IL-13."
+        },
+        {
+          q: "¿Cuál de estos anticuerpos monoclonales tiene como diana la citocina TSLP y es útil en asma grave con o sin biomarcadores T2?",
+          options: ["Tezepelumab", "Mepolizumab", "Benralizumab", "Dupilumab"],
+          answer: 0,
+          feedback: "Tezepelumab (Tezspire) bloquea TSLP por vía SC, abarcando pacientes con asma grave independientemente de su perfil T2."
+        },
+        {
+          q: "¿Qué anticuerpo monoclonal de administración subcutánea (SC) neutraliza directamente la interleucina 5 (IL-5) en el asma eosinofílica?",
+          options: ["Mepolizumab", "Omalizumab", "Tezepelumab", "Dupilumab"],
+          answer: 0,
+          feedback: "Mepolizumab (Nucala) se une directamente a la IL-5 circulante, reduciendo la activación y supervivencia de eosinófilos."
+        }
+      ],
+      extra: [
+        {
+          q: "¿Qué fármaco es un inhibidor selectivo de la fosfodiesterasa 4 (PDE-4) indicado principalmente en EPOC severo y bronquitis crónica?",
+          options: ["Roflumilast", "Sildenafil", "Cromolín", "Zileutón"],
+          answer: 0,
+          feedback: "Roflumilast eleva el AMPc intracelular, disminuyendo citocinas inflamatorias (TNF-α, IL-6, IL-8) y la hipersecreción de moco en bronquitis crónica."
+        },
+        {
+          q: "¿Qué par de fármacos estabiliza la membrana de los mastocitos (canales de Cl-) y tiene utilidad estrictamente profiláctica en asma estacional o por ejercicio?",
+          options: ["Cromolín y Nedocromil", "Montelukast y Zafirlukast", "Salmeterol y Formoterol", "Ipratropio y Tiotropio"],
+          answer: 0,
+          feedback: "Cromolín y nedocromil hiperpolarizan la membrana evitando la degranulación mastocitaria; no sirven una vez iniciada la crisis."
+        },
+        {
+          q: "¿Qué inhibidor de la fosfodiesterasa 5 (PDE-5) fue destacado en clase en neonatos cardiópatas con insuficiencia respiratoria para evitar la taquicardia de los β2?",
+          options: ["Sildenafil", "Roflumilast", "Teofilina", "Adrenalina"],
+          answer: 0,
+          feedback: "A dosis muy bajas en neonatología, el sildenafil ayuda a mejorar la perfusión/ventilación manteniendo AMPc sin provocar la estimulación cardíaca β1."
+        },
+        {
+          q: "¿Cuál de los siguientes fármacos es un antihistamínico H1 que puede complementar el componente alérgico, pero no basta frente a la 'sopa inflamatoria' del asma?",
+          options: ["Loratadina (o Clorfenamina)", "Fluticasona", "Omalizumab", "Montelukast"],
+          answer: 0,
+          feedback: "Los antihistamínicos H1 solo cubren la vía de la histamina; en el asma intervienen múltiples mediadores que requieren corticoides u otras terapias."
+        },
+        {
+          q: "¿Cuál de estos fármacos inhalados debe iniciarse meses antes de la primavera (julio–agosto) porque pierde utilidad si el mastocito ya se degranuló?",
+          options: ["Cromolín", "Salbutamol", "Adrenalina", "Hidrocortisona"],
+          answer: 0,
+          feedback: "El cromolín es estrictamente preventivo: estabiliza la membrana mastocitaria antes de la exposición al polen o ejercicio."
+        },
+        {
+          q: "En patología obstructiva crónica, el efecto antiinflamatorio de Roflumilast se potencia de manera complementaria al asociarlo con:",
+          options: ["Montelukast", "Atropina", "Efedrina", "Clorfenamina"],
+          answer: 0,
+          feedback: "La asociación de roflumilast (inhibidor PDE-4) con montelukast (antagonista CysLT1) suma mecanismos antiinflamatorios complementarios."
+        }
+const CLINICAL_CASES = {
+      broncodilatadores: [
+        {
+          q: "CASO CLÍNICO: Un niño asmático recibe salbutamol a las 8:00 AM con excelente respuesta, pero al repetir dosis al mediodía y en la tarde su saturación cae progresivamente pese a duplicar los puffs. ¿Qué fenómeno explica esta pérdida rápida de efecto?",
+          options: [
+            "Taquifilaxia por desacoplamiento del receptor β2",
+            "Inducción enzimática hepática acelerada",
+            "Bloqueo competitivo de receptores M3",
+            "Efecto de primer paso hepático"
+          ],
+          answer: 0,
+          feedback: "La taquifilaxia con SABA ocurre en pocas horas debido al desacoplamiento funcional entre el receptor β2 y la proteína Gs, anulando la activación de la adenilato ciclasa."
+        },
+        {
+          q: "CASO CLÍNICO: Gestante de 19 semanas acude a un CESFAM rural con contracciones uterinas y amenaza de pérdida; no hay tocolíticos hospitalarios disponibles. ¿Qué fármaco del programa de asma sirve como alternativa de emergencia?",
+          options: [
+            "Salbutamol en jarabe",
+            "Bromuro de ipratropio inhalado",
+            "Beclometasona inhalada",
+            "Montelukast oral"
+          ],
+          answer: 0,
+          feedback: "La musculatura uterina expresa abundantes receptores β2; el salbutamol relaja el miometrio y sirve como medida de rescate mientras se traslada a la paciente."
+        },
+        {
+          q: "CASO CLÍNICO: Paciente asmático de 45 años en tratamiento broncodilatador oral consulta por temblor fino en las manos (evidente al sostener una hoja de papel), nerviosismo y debilidad ocasional. ¿Qué fármaco explica este cuadro?",
+          options: [
+            "Salbutamol (o Terbutalina) vía oral",
+            "Fluticasona inhalada",
+            "Omalizumab subcutáneo",
+            "Cromolín inhalado"
+          ],
+          answer: 0,
+          feedback: "Los agonistas β2 por vía oral (y la teofilina) provocan temblor fino del músculo estriado al acercarse o superar la dosis óptima tolerada."
+        },
+        {
+          q: "CASO CLÍNICO: Hombre de 58 años en terapia con metilxantinas llega a urgencias con vómitos en poso de café, deshidratación, alucinaciones, convulsiones y arritmias, con niveles plasmáticos >40 µg/mL. ¿Qué fármaco causó la intoxicación?",
+          options: [
+            "Teofilina",
+            "Formoterol",
+            "Tiotropio",
+            "Zileutón"
+          ],
+          answer: 0,
+          feedback: "La teofilina tiene un margen terapéutico muy estrecho (10–15 µg/mL); concentraciones >40 µg/mL producen toxicidad grave neurológica, gastrointestinal y cardíaca potencialmente letal."
+        }
+      ],
+      antiinflamatorios: [
+        {
+          q: "CASO CLÍNICO: Niño de 7 años usa su inhalador de fluticasona directo en la boca sin aerocámara ni enjuague posterior. Consulta por placas blanquecinas dolorosas en la mucosa oral. ¿Cuál es la complicación?",
+          options: [
+            "Candidiasis bucofaríngea por inmunosupresión local",
+            "Estomatitis por bloqueo muscarínico M1",
+            "Reacción alérgica mediada por IgE al propelente",
+            "Taquifilaxia de la mucosa orofaríngea"
+          ],
+          answer: 0,
+          feedback: "Alrededor del 80–90% del inhalador sin aerocámara impacta en boca y faringe; los corticoides disminuyen la inmunidad local favoreciendo infecciones oportunistas por Candida albicans."
+        },
+        {
+          q: "CASO CLÍNICO: Profesora de 38 años en tratamiento crónico con budesonida inhalada consulta por disfonía y ronquera progresiva sin signos de infección respiratoria. ¿Cuál es la causa asociada al fármaco?",
+          options: [
+            "Engrosamiento de las cuerdas vocales por depósito local",
+            "Parálisis vagal por bloqueo colinérgico",
+            "Vasoconstricción α1 de la laringe",
+            "Edema angioneurótico por leucotrienos"
+          ],
+          answer: 0,
+          feedback: "El paso repetido de glucocorticoides inhalados puede engrosar las cuerdas vocales provocando ronquera; en casos persistentes se evalúa ajustar técnica o cambiar de vía."
+        },
+        {
+          q: "CASO CLÍNICO: Varón de 52 años con asma crónica ingresa a urgencias desaturando (SaO2 85%, pH 7,2) y requiere estabilización rápida por vía intravenosa junto a O2 y broncodilatadores. ¿Qué corticoide se elige?",
+          options: [
+            "Hidrocortisona",
+            "Prednisona",
+            "Beclometasona",
+            "Ciclesonida"
+          ],
+          answer: 0,
+          feedback: "En urgencias con compromiso agudo y desaturación se prioriza la vía intravenosa, siendo la hidrocortisona la elección frente a corticoides orales (prednisona) o inhalados."
+        },
+        {
+          q: "CASO CLÍNICO: Paciente asmático que usa salbutamol de rescate >2 veces por semana inicia terapia combinada con fluticasona + LABA. Además de frenar la inflamación, ¿cómo potencia la fluticasona al broncodilatador?",
+          options: [
+            "Aumentando la transcripción y expresión de receptores β2",
+            "Inhibiendo la fosfodiesterasa 4 en el músculo liso",
+            "Bloqueando los receptores de adenosina",
+            "Estabilizando los canales de cloruro en mastocitos"
+          ],
+          answer: 0,
+          feedback: "Por mecanismo genómico, los glucocorticoides incrementan los ARNm y la expresión de receptores β2, ejerciendo una acción permisiva que intensifica la respuesta a SABA/LABA."
+        }
+      ],
+      antimuscarinicos: [
+        {
+          q: "CASO CLÍNICO: Hombre de 68 años con EPOC avanzado y fuerte componente colinérgico necesita un antimuscarínico de mantención en dosis única diaria (cada 24 h) para reducir exacerbaciones. ¿Cuál se indica?",
+          options: [
+            "Tiotropio",
+            "Bromuro de ipratropio",
+            "Atropina",
+            "Salbutamol"
+          ],
+          answer: 0,
+          feedback: "El tiotropio (18 µg) dura 24 horas, aumenta la capacidad funcional y disminuye las exacerbaciones en EPOC, donde el tono colinérgico es preponderante."
+        },
+        {
+          q: "CASO CLÍNICO: Paciente de 76 años con infarto agudo al miocardio reciente recibe dosis excesivas de bromuro de ipratropio y desarrolla taquicardia marcada. ¿Qué mecanismo explica este evento?",
+          options: [
+            "Absorción sistémica con bloqueo de receptores M2 cardíacos",
+            "Estimulación directa de receptores β1 miocárdicos",
+            "Inhibición de la enzima 5-lipooxigenasa",
+            "Liberación masiva de adrenalina suprarrenal"
+          ],
+          answer: 0,
+          feedback: "Al antagonizar los receptores M2 cardíacos (que normalmente median bradicardia vagal), predomina el tono adrenérgico y aparece taquicardia, riesgosa en IAM reciente."
+        },
+        {
+          q: "CASO CLÍNICO: Paciente con crisis asmática grave en urgencias tiene respuesta parcial al salbutamol. Se decide sumar un antimuscarínico de acción corta para potenciar la broncodilatación. ¿Cuál se agrega?",
+          options: [
+            "Bromuro de ipratropio",
+            "Atropina subcutánea",
+            "Roflumilast oral",
+            "Nedocromil inhalado"
+          ],
+          answer: 0,
+          feedback: "En asma grave, asociar bromuro de ipratropio al salbutamol potencia la broncodilatación al sumar el bloqueo colinérgico M3 a la estimulación β2."
+        },
+        {
+          q: "CASO CLÍNICO: Paciente recibe 1 mg subcutáneo de un antagonista colinérgico para reducir secreciones antes de una cirugía y desarrolla xerostomía intensa, midriasis, fotofobia y taquicardia. ¿Qué fármaco fue?",
+          options: [
+            "Atropina",
+            "Tiotropio",
+            "Bromuro de ipratropio",
+            "Montelukast"
+          ],
+          answer: 0,
+          feedback: "La atropina bloquea de forma no selectiva todos los receptores muscarínicos (M1–M3) con acción sistémica prolongada, por lo que no se usa en asma."
+        }
+      ],
+      leucotrienos: [
+        {
+          q: "CASO CLÍNICO: Mujer de 34 años con asma toma ácido acetilsalicílico (aspirina) por cefalea y desencadena una crisis broncoobstructiva severa. ¿Cuál es el mecanismo fisiopatológico?",
+          options: [
+            "Inhibición irreversible de la COX que desvía el ácido araquidónico hacia la vía LOX (leucotrienos)",
+            "Bloqueo directo de los receptores β2 bronquiales",
+            "Degranulación directa de mastocitos por activación de PDE-4",
+            "Aumento de la síntesis de prostaglandinas broncodilatadoras"
+          ],
+          answer: 0,
+          feedback: "Al bloquear la ciclooxigenasa (COX) de forma irreversible, todo el sustrato de ácido araquidónico se desvía hacia la 5-lipooxigenasa, elevando los leucotrienos broncoconstrictores."
+        },
+        {
+          q: "CASO CLÍNICO: Niño de 6 años acude a consulta con broncoconstricción activa mediada por leucotrienos ya liberados y circulando en vía aérea. ¿Por qué NO sirve iniciar zileutón en este momento?",
+          options: [
+            "Porque inhibe la síntesis enzimática (5-LO) y no bloquea los mediadores ya liberados",
+            "Porque solo se administra por vía intravenosa en UCI",
+            "Porque provoca bloqueo irreversible de receptores M2",
+            "Porque es un anticuerpo monoclonal que requiere cadena de frío"
+          ],
+          answer: 0,
+          feedback: "Zileutón frena la producción de nuevos leucotrienos (útil solo en profilaxis crónica), pero no impide que los mediadores ya circulantes actúen en su receptor."
+        },
+        {
+          q: "CASO CLÍNICO: Escolar de 8 años con asma leve persistente requiere una terapia oral de mantención de fácil administración y muy bajo perfil de RAM como alternativa a corticoides. ¿Cuál es la opción más usada en Chile?",
+          options: [
+            "Montelukast",
+            "Zileutón",
+            "Teofilina",
+            "Roflumilast"
+          ],
+          answer: 0,
+          feedback: "Montelukast (antagonista del receptor CysLT1) está disponible en Chile, tiene excelente perfil de seguridad en pediatría y eficacia comparable a teofilina en mantención."
+        },
+        {
+          q: "CASO CLÍNICO: Paciente con broncoespasmo intenso por leucotrienos circulantes necesita un fármaco que actúe como 'corcho' impidiendo la unión del mediador a su receptor CysLT1. ¿Cuál cumple este rol?",
+          options: [
+            "Montelukast (o Zafirlukast)",
+            "Zileutón",
+            "Cromolín",
+            "Hidrocortisona"
+          ],
+          answer: 0,
+          feedback: "Los antagonistas competitivos del receptor CysLT1 (montelukast, zafirlukast, pranlukast) bloquean directamente el receptor, impidiendo el espasmo sostenido."
+        }
+      ],
+      monoclonales: [
+        {
+          q: "CASO CLÍNICO: Paciente con asma alérgica grave mediada por IgE que acumulaba 10 hospitalizaciones anuales pese a dosis altas de ICS + LABA inicia un biológico SC y reduce sus hospitalizaciones en 88%. ¿Qué fármaco recibió?",
+          options: [
+            "Omalizumab",
+            "Reslizumab",
+            "Dupilumab",
+            "Tezepelumab"
+          ],
+          answer: 0,
+          feedback: "Omalizumab (Xolair) bloquea la IgE impidiendo su unión a mastocitos, reduciendo drásticamente la frecuencia y severidad de las exacerbaciones en asma alérgica grave."
+        },
+        {
+          q: "CASO CLÍNICO: Adulto con asma eosinofílica grave refractaria es citado al hospital para recibir un anticuerpo monoclonal anti-IL-5 por vía intravenosa (IV). ¿De qué fármaco se trata?",
+          options: [
+            "Reslizumab",
+            "Mepolizumab",
+            "Benralizumab",
+            "Omalizumab"
+          ],
+          answer: 0,
+          feedback: "Reslizumab (Cinqaero/Cinqair) neutraliza la IL-5 y, a diferencia de mepolizumab (SC), su vía principal de administración es intravenosa en adultos."
+        },
+        {
+          q: "CASO CLÍNICO: Paciente con asma fenotipo T2-high (eosinófilos elevados y FeNO aumentado) inicia un biológico SC que bloquea la subunidad IL-4Rα, inhibiendo las vías de IL-4 e IL-13. ¿Cuál es el fármaco?",
+          options: [
+            "Dupilumab",
+            "Tezepelumab",
+            "Omalizumab",
+            "Mepolizumab"
+          ],
+          answer: 0,
+          feedback: "Dupilumab (Dupixent) actúa sobre IL-4Rα por vía subcutánea, bloqueando la cascada inflamatoria mediada por IL-4 e IL-13 en asma T2-high."
+        },
+        {
+          q: "CASO CLÍNICO: Paciente con asma grave refractaria sin biomarcadores T2 elevados inicia un anticuerpo monoclonal subcutáneo dirigido contra la citocina TSLP. ¿Cuál corresponde?",
+          options: [
+            "Tezepelumab",
+            "Benralizumab",
+            "Omalizumab",
+            "Reslizumab"
+          ],
+          answer: 0,
+          feedback: "Tezepelumab (Tezspire) bloquea TSLP y está indicado en asma grave independientemente de la presencia de biomarcadores T2."
+        }
+      ],
+      extra: [
+        {
+          q: "CASO CLÍNICO: Recién nacido cardiópata complicado con insuficiencia respiratoria necesita mejorar su perfusión y ventilación pulmonar evitando la taquicardia de los agonistas β2. ¿Qué fármaco se prefiere a dosis muy bajas?",
+          options: [
+            "Sildenafil",
+            "Adrenalina",
+            "Teofilina",
+            "Efedrina"
+          ],
+          answer: 0,
+          feedback: "En neonatología, el sildenafil (inhibidor PDE-5) en dosis muy bajas (1–2 mg) ayuda a mantener AMPc y mejorar la perfusión/ventilación sin el estímulo β1 cardíaco."
+        },
+        {
+          q: "CASO CLÍNICO: Paciente asmático que presenta crisis cada septiembre por polen consulta en julio buscando un inhalador profiláctico que estabilice la membrana de los mastocitos antes de la primavera. ¿Cuál se indica?",
+          options: [
+            "Cromolín (o Nedocromil)",
+            "Salbutamol",
+            "Adrenalina",
+            "Hidrocortisona"
+          ],
+          answer: 0,
+          feedback: "Cromolín y nedocromil abren canales de Cl- hiperpolarizando y estabilizando al mastocito; solo sirven de forma preventiva antes de que ocurra la degranulación."
+        },
+        {
+          q: "CASO CLÍNICO: Varón de 64 años con EPOC severo y bronquitis crónica inicia un inhibidor selectivo de la PDE-4 para reducir la tos y el moco, desarrollando luego náuseas, diarrea y pérdida de peso. ¿Qué fármaco toma?",
+          options: [
+            "Roflumilast",
+            "Montelukast",
+            "Tiotropio",
+            "Budesonida"
+          ],
+          answer: 0,
+          feedback: "Roflumilast reduce la inflamación y secreción mucosa en EPOC severo, pero sus efectos adversos gastrointestinales (náuseas, diarrea, baja de peso) suelen ser limitantes."
+        },
+        {
+          q: "CASO CLÍNICO: Paciente alérgico inicia una crisis asmática aguda y un familiar le recomienda tomar solo loratadina. ¿Por qué esta conducta es insuficiente?",
+          options: [
+            "Porque solo bloquea receptores H1 y no controla la 'sopa inflamatoria' de múltiples mediadores del asma",
+            "Porque la loratadina induce broncoconstricción por vía COX",
+            "Porque los antihistamínicos H1 antagonizan al salbutamol",
+            "Porque requiere cadena de frío para actuar en bronquios"
+          ],
+          answer: 0,
+          feedback: "Los antihistamínicos H1 cubren solo una fracción menor (histamina); en una crisis asmática participan leucotrienos, citocinas y células inflamatorias que requieren broncodilatadores y corticoides."
+        }
+      ]
+    };
+
+    // Fusionar automáticamente los casos clínicos en el banco principal
+    Object.keys(CLINICAL_CASES).forEach(cat => {
+      QUESTION_BANK[cat].push(...CLINICAL_CASES[cat]);
+    });
+      ]
+    };
+
+    // Estado del juego
+    const GOAL_SCORE = 1500;
+    let score = 0;
+    let lives = 3;
+    let streak = 0;
+    let bestStreak = 0;
+    let totalAnswered = 0;
+    let totalCorrect = 0;
+    let studyMode = false;
+    let soundEnabled = true;
+    let isSpinning = false;
+    let currentAngle = 0;
+    let usedIndices = {};
+
+    // Referencias DOM
+    const canvas = document.getElementById("wheel");
+    const ctx = canvas.getContext("2d");
+    const spinBtn = document.getElementById("spinBtn");
+    const livesDisplay = document.getElementById("livesDisplay");
+    const scoreDisplay = document.getElementById("scoreDisplay");
+    const streakDisplay = document.getElementById("streakDisplay");
+    const studyModeBtn = document.getElementById("studyModeBtn");
+    const soundBtn = document.getElementById("soundBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const legendEl = document.getElementById("legend");
+
+    const questionModal = document.getElementById("questionModal");
+    const modalCategory = document.getElementById("modalCategory");
+    const modalQuestion = document.getElementById("modalQuestion");
+    const modalOptions = document.getElementById("modalOptions");
+    const modalFeedback = document.getElementById("modalFeedback");
+    const continueBtn = document.getElementById("continueBtn");
+
+    const endModal = document.getElementById("endModal");
+    const endTitle = document.getElementById("endTitle");
+    const endSubtitle = document.getElementById("endSubtitle");
+    const finalScore = document.getElementById("finalScore");
+    const finalAccuracy = document.getElementById("finalAccuracy");
+    const finalBestStreak = document.getElementById("finalBestStreak");
+    const playAgainBtn = document.getElementById("playAgainBtn");
+
+    // Audio simple con Web Audio API
+    let audioCtx = null;
+    function playTone(freq, duration = 0.08, type = "sine", vol = 0.08) {
+      if (!soundEnabled) return;
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (_) {}
+    }
+
+    // Dibujar leyenda
+    function renderLegend() {
+      legendEl.innerHTML = CATEGORIES.map(cat => `
+        <div class="legend-item">
+          <span class="legend-dot" style="background:${cat.color}"></span>
+          <span>${cat.name}</span>
+        </div>
+      `).join("");
+    }
+
+    // Dibujar ruleta
+    function drawWheel() {
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2;
+      const radius = cx - 10;
+      const arc = (2 * Math.PI) / CATEGORIES.length;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      CATEGORIES.forEach((cat, i) => {
+        const start = currentAngle + i * arc;
+        const end = start + arc;
+
+        // Sector
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, radius, start, end);
+        ctx.closePath();
+        ctx.fillStyle = cat.color;
+        ctx.fill();
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = "#0f172a";
+        ctx.stroke();
+
+        // Etiqueta
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(start + arc / 2);
+        ctx.textAlign = "right";
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "800 22px 'Segoe UI', sans-serif";
+        ctx.shadowColor = "rgba(0,0,0,0.45)";
+        ctx.shadowBlur = 4;
+        ctx.fillText(cat.short, radius - 26, 8);
+        ctx.restore();
+      });
+
+      // Centro decorativo
+      ctx.beginPath();
+      ctx.arc(cx, cy, 42, 0, 2 * Math.PI);
+      ctx.fillStyle = "#0f172a";
+      ctx.fill();
+      ctx.lineWidth = 5;
+      ctx.strokeStyle = "#f8fafc";
+      ctx.stroke();
+
+      ctx.fillStyle = "#f8fafc";
+      ctx.font = "800 18px 'Segoe UI', sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("GIRAR", cx, cy);
+    }
+
+    function updateHUD() {
+      livesDisplay.textContent = studyMode ? "∞ Estudio" : "❤️".repeat(lives) + "🖤".repeat(3 - lives);
+      scoreDisplay.textContent = score;
+      streakDisplay.textContent = streak;
+    }
+
+    function spinWheel() {
+      if (isSpinning) return;
+      isSpinning = true;
+      spinBtn.disabled = true;
+
+      const extraSpins = 5 + Math.random() * 4;
+      const targetAngle = currentAngle + extraSpins * 2 * Math.PI + Math.random() * 2 * Math.PI;
+      const duration = 3600;
+      const startTime = performance.now();
+      const startAngle = currentAngle;
+      let lastSector = -1;
+
+      function animate(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        currentAngle = startAngle + (targetAngle - startAngle) * eased;
+        drawWheel();
+
+        // Sonido tick al cambiar de sector
+        const arc = (2 * Math.PI) / CATEGORIES.length;
+        const pointerAngle = (3 * Math.PI / 2 - (currentAngle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+        const sector = Math.floor(pointerAngle / arc) % CATEGORIES.length;
+        if (sector !== lastSector) {
+          lastSector = sector;
+          playTone(520, 0.03, "triangle", 0.04);
+        }
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          currentAngle %= 2 * Math.PI;
+          isSpinning = false;
+          setTimeout(() => openQuestion(CATEGORIES[sector]), 350);
+        }
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    function getNextQuestion(categoryId) {
+      const bank = QUESTION_BANK[categoryId];
+      if (!usedIndices[categoryId] || usedIndices[categoryId].length >= bank.length) {
+        usedIndices[categoryId] = [];
+      }
+      const available = bank
+        .map((_, idx) => idx)
+        .filter(idx => !usedIndices[categoryId].includes(idx));
+      const chosenIdx = available[Math.floor(Math.random() * available.length)];
+      usedIndices[categoryId].push(chosenIdx);
+      return bank[chosenIdx];
+    }
+
+    function openQuestion(category) {
+      const qData = getNextQuestion(category.id);
+
+      modalCategory.textContent = category.name;
+      modalCategory.style.background = category.color;
+      modalQuestion.textContent = qData.q;
+      modalFeedback.className = "feedback-box";
+      modalFeedback.textContent = "";
+      continueBtn.className = "next-btn";
+
+      // Mezclar alternativas manteniendo índice correcto
+      const indexedOptions = qData.options.map((text, idx) => ({
+        text,
+        isCorrect: idx === qData.answer
+      }));
+      for (let i = indexedOptions.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [indexedOptions[i], indexedOptions[j]] = [indexedOptions[j], indexedOptions[i]];
+      }
+
+      modalOptions.innerHTML = "";
+      indexedOptions.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.textContent = opt.text;
+        btn.addEventListener("click", () => handleAnswer(btn, opt.isCorrect, indexedOptions, qData.feedback));
+        modalOptions.appendChild(btn);
+      });
+
+      questionModal.classList.add("open");
+    }
+
+    function handleAnswer(clickedBtn, isCorrect, allOptions, feedback) {
+      const buttons = modalOptions.querySelectorAll(".option-btn");
+      buttons.forEach((btn, idx) => {
+        btn.disabled = true;
+        if (allOptions[idx].isCorrect) btn.classList.add("correct");
+      });
+
+      totalAnswered++;
+
+      if (isCorrect) {
+        totalCorrect++;
+        streak++;
+        if (streak > bestStreak) bestStreak = streak;
+        const pointsEarned = 100 + (streak >= 3 ? 50 : 0);
+        score += pointsEarned;
+        playTone(660, 0.12, "sine", 0.09);
+        setTimeout(() => playTone(880, 0.18, "sine", 0.09), 110);
+        modalFeedback.innerHTML = `<strong>¡Correcto! (+${pointsEarned} pts)</strong><br>${feedback}`;
+        modalFeedback.style.borderLeftColor = "var(--correct)";
+      } else {
+        clickedBtn.classList.add("wrong");
+        streak = 0;
+        if (!studyMode) lives--;
+        playTone(220, 0.25, "sawtooth", 0.07);
+        modalFeedback.innerHTML = `<strong>Incorrecto.</strong><br>${feedback}`;
+        modalFeedback.style.borderLeftColor = "var(--wrong)";
+      }
+
+      updateHUD();
+      modalFeedback.classList.add("show");
+      continueBtn.classList.add("show");
+    }
+
+    function checkEndGame() {
+      if (!studyMode && lives <= 0) {
+        showEndModal("¡Sin vidas!", "Repasa la retroalimentación de cada fármaco e inténtalo nuevamente.");
+        return true;
+      }
+      if (!studyMode && score >= GOAL_SCORE) {
+        showEndModal("¡Meta alcanzada!", "Dominaste los fármacos del aparato respiratorio.");
+        return true;
+      }
+      return false;
+    }
+
+    function showEndModal(title, subtitle) {
+      endTitle.textContent = title;
+      endSubtitle.textContent = subtitle;
+      finalScore.textContent = score;
+      finalAccuracy.textContent = totalAnswered ? Math.round((totalCorrect / totalAnswered) * 100) + "%" : "0%";
+      finalBestStreak.textContent = bestStreak;
+      endModal.classList.add("open");
+    }
+
+    function resetGame() {
+      score = 0;
+      lives = 3;
+      streak = 0;
+      bestStreak = 0;
+      totalAnswered = 0;
+      totalCorrect = 0;
+      usedIndices = {};
+      endModal.classList.remove("open");
+      questionModal.classList.remove("open");
+      spinBtn.disabled = false;
+      updateHUD();
+    }
+
+    // Eventos
+    spinBtn.addEventListener("click", spinWheel);
+    canvas.addEventListener("click", spinWheel);
+
+    continueBtn.addEventListener("click", () => {
+      questionModal.classList.remove("open");
+      if (!checkEndGame()) {
+        spinBtn.disabled = false;
+      }
+    });
+
+    studyModeBtn.addEventListener("click", () => {
+      studyMode = !studyMode;
+      studyModeBtn.classList.toggle("active", studyMode);
+      updateHUD();
+    });
+
+    soundBtn.addEventListener("click", () => {
+      soundEnabled = !soundEnabled;
+      soundBtn.textContent = soundEnabled ? "🔊" : "🔇";
+    });
+
+    resetBtn.addEventListener("click", resetGame);
+    playAgainBtn.addEventListener("click", resetGame);
+
+    // Inicializar
+    renderLegend();
+    updateHUD();
+    drawWheel();
+  </script>
+</body>
+</html>
